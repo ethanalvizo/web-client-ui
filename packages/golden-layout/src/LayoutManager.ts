@@ -15,7 +15,6 @@ import {
   DragSource,
   DragSourceFromEvent,
   DropTargetIndicator,
-  TransitionIndicator,
 } from './controls';
 import { ConfigurationError } from './errors';
 import {
@@ -37,9 +36,10 @@ import {
   getUniqueId,
   stripTags,
 } from './utils';
+import { DragListenerEvent } from './utils/DragListener';
 
 export type ComponentConstructor<
-  C extends ComponentConfig | ReactComponentConfig = ComponentConfig
+  C extends ComponentConfig | ReactComponentConfig = ComponentConfig,
 > = {
   new (container: ItemContainer<C>, state: unknown): unknown;
 };
@@ -50,7 +50,7 @@ export type ComponentConstructor<
  * @param config
  * @param container Can be a jQuery selector string or a Dom element. Defaults to body
  */
-export default class LayoutManager extends EventEmitter {
+export class LayoutManager extends EventEmitter {
   /**
    * Hook that allows to access private classes
    */
@@ -88,7 +88,7 @@ export default class LayoutManager extends EventEmitter {
       | ComponentConstructor
       | ComponentConstructor<ReactComponentConfig>
       | React.Component
-      | React.ForwardRefExoticComponent<any>;
+      | React.ComponentType;
   } = { 'lm-react-component': ReactComponentHandler };
 
   private _fallbackComponent?:
@@ -116,7 +116,6 @@ export default class LayoutManager extends EventEmitter {
   container: JQuery<HTMLElement>;
   private _originalContainer: JQuery<HTMLElement> | HTMLElement | undefined;
   dropTargetIndicator: DropTargetIndicator | null = null;
-  transitionIndicator: TransitionIndicator | null = null;
   tabDropPlaceholder = $('<div class="lm_drop_tab_placeholder"></div>');
 
   private _typeToItem: {
@@ -170,7 +169,7 @@ export default class LayoutManager extends EventEmitter {
     constructor:
       | ComponentConstructor
       | React.Component
-      | React.ForwardRefExoticComponent<any>
+      | React.ComponentType<any>
   ) {
     if (
       typeof constructor !== 'function' &&
@@ -269,15 +268,15 @@ export default class LayoutManager extends EventEmitter {
 
     if (root) {
       next(
-        (config as unknown) as ComponentConfig & Record<string, unknown>,
+        config as unknown as ComponentConfig & Record<string, unknown>,
         { contentItems: [root] } as AbstractContentItem & {
           config: Record<string, unknown>;
         }
       );
     } else {
       next(
-        (config as unknown) as ComponentConfig & Record<string, unknown>,
-        (this.root as unknown) as AbstractContentItem & {
+        config as unknown as ComponentConfig & Record<string, unknown>,
+        this.root as unknown as AbstractContentItem & {
           config: Record<string, unknown>;
         }
       );
@@ -362,7 +361,6 @@ export default class LayoutManager extends EventEmitter {
 
     this._setContainer();
     this.dropTargetIndicator = new DropTargetIndicator();
-    this.transitionIndicator = new TransitionIndicator();
     this.updateSize();
     this._create(this.config);
     this._bindEvents();
@@ -450,7 +448,6 @@ export default class LayoutManager extends EventEmitter {
     this.root.contentItems = [];
     this.tabDropPlaceholder.remove();
     this.dropTargetIndicator?.destroy();
-    this.transitionIndicator?.destroy();
     this.eventHub.destroy();
 
     this._dragSources.forEach(function (dragSource) {
@@ -657,7 +654,7 @@ export default class LayoutManager extends EventEmitter {
    */
   createDragSourceFromEvent(
     itemConfig: ItemConfig | (() => ItemConfig),
-    event: JQuery.TriggeredEvent
+    event: DragListenerEvent
   ) {
     this.config.settings.constrainDragToContainer = false;
     return new DragSourceFromEvent(itemConfig, this, event);
@@ -1037,8 +1034,9 @@ export default class LayoutManager extends EventEmitter {
      * to allow the opening window to interact with
      * it
      */
-    (window as Window &
-      typeof globalThis & { __glInstance: LayoutManager }).__glInstance = this;
+    (
+      window as Window & typeof globalThis & { __glInstance: LayoutManager }
+    ).__glInstance = this;
   }
 
   /**
@@ -1256,3 +1254,5 @@ export default class LayoutManager extends EventEmitter {
     });
   }
 }
+
+export default LayoutManager;

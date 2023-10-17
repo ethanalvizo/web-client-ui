@@ -79,20 +79,19 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       dedupe: ['react', 'react-redux', 'redux'],
-      alias: [
-        {
-          find: /^@deephaven\/(.*)\/scss\/(.*)/,
-          replacement: `${packagesDir}/$1/scss/$2`,
-        },
-        {
-          find: /^@deephaven\/icons$/,
-          replacement: `${packagesDir}/icons/dist/index.es.js`,
-        },
-        {
-          find: /^@deephaven\/(.*)/,
-          replacement: `${packagesDir}/$1/src`,
-        },
-      ],
+      alias:
+        mode === 'development'
+          ? [
+              {
+                find: /^@deephaven\/(.*)\/scss\/(.*)/,
+                replacement: `${packagesDir}/$1/scss/$2`,
+              },
+              {
+                find: /^@deephaven\/(?!icons)(.*)/, // Icons package can not import from src
+                replacement: `${packagesDir}/$1/src`,
+              },
+            ]
+          : [],
     },
     build: {
       outDir: path.resolve(__dirname, env.VITE_BUILD_PATH),

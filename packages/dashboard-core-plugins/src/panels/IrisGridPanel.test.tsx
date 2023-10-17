@@ -9,7 +9,7 @@ import type { Container } from '@deephaven/golden-layout';
 import { Workspace } from '@deephaven/redux';
 import { IrisGridPanel } from './IrisGridPanel';
 
-const MockIrisGrid = jest.fn(() => null);
+const MockIrisGrid: React.FC & jest.Mock = jest.fn(() => null);
 
 jest.mock('@deephaven/iris-grid', () => {
   const { forwardRef } = jest.requireActual('react');
@@ -66,7 +66,7 @@ function makeIrisGridPanelWrapper(
     <IrisGridPanel
       makeModel={makeModel}
       metadata={metadata}
-      glContainer={(glContainer as unknown) as Container}
+      glContainer={glContainer as unknown as Container}
       glEventHub={glEventHub}
       user={user}
       inputFilters={inputFilters}
@@ -84,10 +84,9 @@ function makeIrisGridPanelWrapper(
 async function expectLoading(container) {
   await waitFor(() =>
     expect(
-      container.querySelector("[data-icon='circle-large']")
+      container.querySelector('[role=progressbar].loading-spinner-large')
     ).toBeInTheDocument()
   );
-  expect(container.querySelector("[data-icon='loading']")).toBeInTheDocument();
 }
 
 async function expectNotLoading(container) {
@@ -97,7 +96,7 @@ async function expectNotLoading(container) {
     ).not.toBeInTheDocument()
   );
   expect(
-    container.querySelector("[data-icon='loading']")
+    container.querySelector('[role=progressbar].loading-spinner-large')
   ).not.toBeInTheDocument();
 }
 
@@ -127,17 +126,17 @@ it('shows the loading spinner until grid is ready', async () => {
   const tablePromise = Promise.resolve(table);
   const makeModel = makeMakeModel(tablePromise);
 
-  expect.assertions(6);
+  expect.assertions(4);
   const { container } = makeIrisGridPanelWrapper(makeModel);
 
   await expectLoading(container);
 
   await expectLoading(container);
-  const params = ((MockIrisGrid.mock.calls[
-    MockIrisGrid.mock.calls.length - 1
-  ] as unknown) as {
-    onStateChange(param1: unknown, param2: unknown);
-  }[])[0];
+  const params = (
+    MockIrisGrid.mock.calls[MockIrisGrid.mock.calls.length - 1] as unknown as {
+      onStateChange(param1: unknown, param2: unknown);
+    }[]
+  )[0];
   params.onStateChange({}, {});
 
   await expectNotLoading(container);

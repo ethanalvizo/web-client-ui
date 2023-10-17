@@ -3,6 +3,107 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.49.1](https://github.com/deephaven/web-client-ui/compare/v0.49.0...v0.49.1) (2023-09-27)
+
+
+### Bug Fixes
+
+* Dehydration of class components ([#1535](https://github.com/deephaven/web-client-ui/issues/1535)) ([3e834de](https://github.com/deephaven/web-client-ui/commit/3e834de31a5ba8df8041637ece4aacfa7fbcd794)), closes [#1534](https://github.com/deephaven/web-client-ui/issues/1534)
+
+
+
+
+
+# [0.49.0](https://github.com/deephaven/web-client-ui/compare/v0.48.0...v0.49.0) (2023-09-15)
+
+**Note:** Version bump only for package @deephaven/dashboard
+
+
+
+
+
+# [0.48.0](https://github.com/deephaven/web-client-ui/compare/v0.47.0...v0.48.0) (2023-09-12)
+
+**Note:** Version bump only for package @deephaven/dashboard
+
+
+
+
+
+# [0.47.0](https://github.com/deephaven/web-client-ui/compare/v0.46.1...v0.47.0) (2023-09-08)
+
+
+### Features
+
+* Consolidate and normalize plugin types ([#1456](https://github.com/deephaven/web-client-ui/issues/1456)) ([43a782d](https://github.com/deephaven/web-client-ui/commit/43a782dd3ebf582b18e155fdbc313176b0bf0f84)), closes [#1454](https://github.com/deephaven/web-client-ui/issues/1454) [#1451](https://github.com/deephaven/web-client-ui/issues/1451)
+
+
+
+
+
+## [0.46.1](https://github.com/deephaven/web-client-ui/compare/v0.46.0...v0.46.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* Remove unused ref forwarded to all dashboard panels ([#1451](https://github.com/deephaven/web-client-ui/issues/1451)) ([938aa07](https://github.com/deephaven/web-client-ui/commit/938aa0724abb58b09d8ce1d339766b1072c95202))
+
+
+
+
+
+# [0.46.0](https://github.com/deephaven/web-client-ui/compare/v0.45.1...v0.46.0) (2023-08-18)
+
+**Note:** Version bump only for package @deephaven/dashboard
+
+
+
+
+
+# [0.45.0](https://github.com/deephaven/web-client-ui/compare/v0.44.1...v0.45.0) (2023-07-31)
+
+**Note:** Version bump only for package @deephaven/dashboard
+
+# [0.44.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.44.0) (2023-07-07)
+
+**Note:** Version bump only for package @deephaven/dashboard
+
+# [0.43.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.43.0) (2023-07-07)
+
+**Note:** Version bump only for package @deephaven/dashboard
+
+# [0.42.0](https://github.com/deephaven/web-client-ui/compare/v0.41.1...v0.42.0) (2023-06-29)
+
+**Note:** Version bump only for package @deephaven/dashboard
+
+## [0.41.1](https://github.com/deephaven/web-client-ui/compare/v0.41.0...v0.41.1) (2023-06-08)
+
+### Bug Fixes
+
+- Cannot add control from Controls menu with click ([#1363](https://github.com/deephaven/web-client-ui/issues/1363)) ([65c0925](https://github.com/deephaven/web-client-ui/commit/65c09253608f7c8c887ca4e70cc5632e81673301)), closes [#1362](https://github.com/deephaven/web-client-ui/issues/1362)
+
+# [0.41.0](https://github.com/deephaven/web-client-ui/compare/v0.40.4...v0.41.0) (2023-06-08)
+
+**Note:** Version bump only for package @deephaven/dashboard
+
+## [0.40.4](https://github.com/deephaven/web-client-ui/compare/v0.40.3...v0.40.4) (2023-06-02)
+
+### Bug Fixes
+
+- Add a default DashboardPanelWrapper ([#1346](https://github.com/deephaven/web-client-ui/issues/1346)) ([ddd92cf](https://github.com/deephaven/web-client-ui/commit/ddd92cf94ee038da9f6b998b12f533d17a400bc4)), closes [#1329](https://github.com/deephaven/web-client-ui/issues/1329)
+
+## [0.40.3](https://github.com/deephaven/web-client-ui/compare/v0.40.2...v0.40.3) (2023-05-31)
+
+### Reverts
+
+- "refactor: Clean up golden-layout css ([#1322](https://github.com/deephaven/web-client-ui/issues/1322))" ([#1334](https://github.com/deephaven/web-client-ui/issues/1334)) ([2f7928a](https://github.com/deephaven/web-client-ui/commit/2f7928a67e14f2026aef73cee542045ce7477351))
+
+## [0.40.2](https://github.com/deephaven/web-client-ui/compare/v0.40.1...v0.40.2) (2023-05-31)
+
+### Bug Fixes
+
+- Worker plugin definitions, optional panel wrapper for Dashboards ([#1329](https://github.com/deephaven/web-client-ui/issues/1329)) ([c32ffbc](https://github.com/deephaven/web-client-ui/commit/c32ffbcf66826c4e2da3ac82e5b5086524d05ec8))
+
 ## [0.40.1](https://github.com/deephaven/web-client-ui/compare/v0.40.0...v0.40.1) (2023-05-24)
 
 **Note:** Version bump only for package @deephaven/dashboard

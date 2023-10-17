@@ -14,19 +14,18 @@ import {
 } from '@deephaven/chart';
 import type PlotlyType from 'plotly.js';
 import {
+  DashboardPanelProps,
   getOpenedPanelMapForDashboard,
   LayoutUtils,
   PanelComponent,
+  PanelMetadata,
   PanelProps,
 } from '@deephaven/dashboard';
 import {
   IrisGridUtils,
   InputFilter,
   ColumnName,
-  DehydratedSort,
-  DehydratedAdvancedFilter,
-  DehydratedQuickFilter,
-  LegacyDehydratedSort,
+  TableSettings,
 } from '@deephaven/iris-grid';
 import type {
   FigureDescriptor,
@@ -48,7 +47,6 @@ import {
   PromiseUtils,
   TextUtils,
 } from '@deephaven/utils';
-import type { Container, EventEmitter } from '@deephaven/golden-layout';
 import WidgetPanel from './WidgetPanel';
 import ToolType from '../linker/ToolType';
 import { InputFilterEvent, ChartEvent } from '../events';
@@ -77,13 +75,15 @@ export type InputFilterMap = Map<string, InputFilter>;
 
 export type LinkedColumnMap = Map<string, { name: string; type: string }>;
 
-export type ChartPanelFigureMetadata = {
-  name: string;
-  figure: string;
-};
+/** @deprecated Use `PanelMetadata` instead, providing a `name` instead of `figure` */
+export interface ChartPanelFigureMetadata extends PanelMetadata {
+  /**
+   * @deprecated use `name` instead
+   */
+  figure?: string;
+}
 
-export type ChartPanelTableMetadata = {
-  name: string;
+export interface ChartPanelTableMetadata extends PanelMetadata {
   table: string;
   sourcePanelId: string;
   settings: {
@@ -93,8 +93,8 @@ export type ChartPanelTableMetadata = {
     series: string[];
     type: keyof SeriesPlotStyle;
   };
-  tableSettings: ChartPanelTableSettings;
-};
+  tableSettings: TableSettings;
+}
 
 export type ChartPanelMetadata =
   | ChartPanelFigureMetadata
@@ -102,18 +102,10 @@ export type ChartPanelMetadata =
 
 type Settings = Record<string, unknown>;
 
-export interface ChartPanelTableSettings {
-  quickFilters?: readonly DehydratedQuickFilter[];
-  advancedFilters?: readonly DehydratedAdvancedFilter[];
-  inputFilters?: readonly InputFilter[];
-  sorts?: readonly (DehydratedSort | LegacyDehydratedSort)[];
-  partition?: unknown;
-  partitionColumn?: string;
-}
 export interface GLChartPanelState {
-  filterValueMap: [string, unknown][];
+  filterValueMap?: [string, unknown][];
   settings: Partial<ChartModelSettings>;
-  tableSettings: ChartPanelTableSettings;
+  tableSettings: TableSettings;
   irisGridState?: {
     advancedFilters: unknown;
     quickFilters: unknown;
@@ -126,9 +118,7 @@ export interface GLChartPanelState {
   table?: string;
   figure?: string;
 }
-export interface ChartPanelProps {
-  glContainer: Container;
-  glEventHub: EventEmitter;
+export interface ChartPanelProps extends DashboardPanelProps {
   metadata: ChartPanelMetadata;
   /** Function to build the ChartModel used by this ChartPanel. Can return a promise. */
   makeModel: () => Promise<ChartModel>;
@@ -145,6 +135,8 @@ export interface ChartPanelProps {
     secondParam: undefined
   ) => void;
   Plotly?: typeof PlotlyType;
+  /** The panel container div */
+  containerRef?: RefObject<HTMLDivElement>;
 
   panelState: GLChartPanelState;
   settings: Partial<WorkspaceSettings>;
@@ -194,6 +186,7 @@ export class ChartPanel extends Component<ChartPanelProps, ChartPanelState> {
     sourcePanel: null,
     panelState: null,
     settings: {},
+    containerRef: null,
   };
 
   static displayName = 'ChartPanel';
@@ -229,7 +222,7 @@ export class ChartPanel extends Component<ChartPanelProps, ChartPanelState> {
     );
     this.handleClearAllFilters = this.handleClearAllFilters.bind(this);
 
-    this.panelContainer = React.createRef();
+    this.panelContainer = props.containerRef ?? React.createRef();
     this.chart = React.createRef();
     this.pending = new Pending();
 
@@ -274,14 +267,8 @@ export class ChartPanel extends Component<ChartPanelProps, ChartPanelState> {
     prevState: ChartPanelState
   ): void {
     const { inputFilters, source } = this.props;
-    const {
-      columnMap,
-      model,
-      filterMap,
-      filterValueMap,
-      isLinked,
-      settings,
-    } = this.state;
+    const { columnMap, model, filterMap, filterValueMap, isLinked, settings } =
+      this.state;
 
     if (!model) {
       return;
@@ -629,10 +616,10 @@ export class ChartPanel extends Component<ChartPanelProps, ChartPanelState> {
       this.pending
         .add(
           dh.plot.Figure.create(
-            (new ChartUtils(dh).makeFigureSettings(
+            new ChartUtils(dh).makeFigureSettings(
               settings,
               source
-            ) as unknown) as FigureDescriptor
+            ) as unknown as FigureDescriptor
           )
         )
         .then(figure => {
@@ -772,9 +759,8 @@ export class ChartPanel extends Component<ChartPanelProps, ChartPanelState> {
   }
 
   getCoordinateForColumn(columnName: ColumnName): [number, number] | null {
-    const className = ChartColumnSelectorOverlay.makeButtonClassName(
-      columnName
-    );
+    const className =
+      ChartColumnSelectorOverlay.makeButtonClassName(columnName);
 
     if (!this.panelContainer.current) {
       return null;
@@ -1174,7 +1160,17 @@ export class ChartPanel extends Component<ChartPanelProps, ChartPanelState> {
 const mapStateToProps = (
   state: RootState,
   ownProps: { localDashboardId: string; metadata: { sourcePanelId?: string } }
-) => {
+): Omit<
+  ChartPanelProps,
+  | 'glContainer'
+  | 'glEventHub'
+  | 'localDashboardId'
+  | 'makeModel'
+  | 'metadata'
+  | 'panelState'
+  | 'setActiveTool'
+  | 'setDashboardIsolatedLinkerPanelId'
+> => {
   const { localDashboardId, metadata } = ownProps;
 
   let sourcePanelId;

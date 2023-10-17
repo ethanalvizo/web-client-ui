@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.49.0](https://github.com/deephaven/web-client-ui/compare/v0.48.0...v0.49.0) (2023-09-15)
+
+**Note:** Version bump only for package @deephaven/eslint-config
+
+
+
+
+
+# [0.48.0](https://github.com/deephaven/web-client-ui/compare/v0.47.0...v0.48.0) (2023-09-12)
+
+**Note:** Version bump only for package @deephaven/eslint-config
+
+
+
+
+
+# [0.47.0](https://github.com/deephaven/web-client-ui/compare/v0.46.1...v0.47.0) (2023-09-08)
+
+**Note:** Version bump only for package @deephaven/eslint-config
+
+
+
+
+
+# [0.46.0](https://github.com/deephaven/web-client-ui/compare/v0.45.1...v0.46.0) (2023-08-18)
+
+**Note:** Version bump only for package @deephaven/eslint-config
+
+
+
+
+
+# [0.45.0](https://github.com/deephaven/web-client-ui/compare/v0.44.1...v0.45.0) (2023-07-31)
+
+### Features
+
+- Upgrade Prettier to 3.0.0 ([#1420](https://github.com/deephaven/web-client-ui/issues/1420)) ([334e530](https://github.com/deephaven/web-client-ui/commit/334e530bf83cebf2cfe3593f2d6e9fd7304c562a)), closes [#1419](https://github.com/deephaven/web-client-ui/issues/1419)
+
+# [0.44.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.44.0) (2023-07-07)
+
+**Note:** Version bump only for package @deephaven/eslint-config
+
+# [0.43.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.43.0) (2023-07-07)
+
+**Note:** Version bump only for package @deephaven/eslint-config
+
+# [0.42.0](https://github.com/deephaven/web-client-ui/compare/v0.41.1...v0.42.0) (2023-06-29)
+
+**Note:** Version bump only for package @deephaven/eslint-config
+
+# [0.41.0](https://github.com/deephaven/web-client-ui/compare/v0.40.4...v0.41.0) (2023-06-08)
+
+**Note:** Version bump only for package @deephaven/eslint-config
+
 # [0.40.0](https://github.com/deephaven/web-client-ui/compare/v0.39.0...v0.40.0) (2023-05-19)
 
 **Note:** Version bump only for package @deephaven/eslint-config

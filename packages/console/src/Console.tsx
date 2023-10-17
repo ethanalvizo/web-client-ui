@@ -140,7 +140,7 @@ export class Console extends PureComponent<ConsoleProps, ConsoleState> {
    * @returns true if the log level should be output to the console
    */
   static isOutputLevel(
-    logLevel: typeof LogLevel[keyof typeof LogLevel]
+    logLevel: (typeof LogLevel)[keyof typeof LogLevel]
   ): boolean {
     // We want all errors to be output, in addition to STDOUT.
     // That way the user is more likely to see them.
@@ -158,12 +158,10 @@ export class Console extends PureComponent<ConsoleProps, ConsoleState> {
     this.handleLogMessage = this.handleLogMessage.bind(this);
     this.handleOverflowActions = this.handleOverflowActions.bind(this);
     this.handleScrollPaneScroll = this.handleScrollPaneScroll.bind(this);
-    this.handleToggleAutoLaunchPanels = this.handleToggleAutoLaunchPanels.bind(
-      this
-    );
-    this.handleToggleClosePanelsOnDisconnect = this.handleToggleClosePanelsOnDisconnect.bind(
-      this
-    );
+    this.handleToggleAutoLaunchPanels =
+      this.handleToggleAutoLaunchPanels.bind(this);
+    this.handleToggleClosePanelsOnDisconnect =
+      this.handleToggleClosePanelsOnDisconnect.bind(this);
     this.handleTogglePrintStdout = this.handleTogglePrintStdout.bind(this);
     this.handleUploadCsv = this.handleUploadCsv.bind(this);
     this.handleHideCsv = this.handleHideCsv.bind(this);
@@ -412,7 +410,7 @@ export class Console extends PureComponent<ConsoleProps, ConsoleState> {
 
     if (
       Console.isOutputLevel(
-        message.logLevel as typeof LogLevel[keyof typeof LogLevel]
+        message.logLevel as (typeof LogLevel)[keyof typeof LogLevel]
       )
     ) {
       this.queueLogMessage(message.message, message.logLevel);
@@ -422,7 +420,7 @@ export class Console extends PureComponent<ConsoleProps, ConsoleState> {
   queueLogMessage(message: string, logLevel: string): void {
     const result: Record<string, string> = {};
     if (
-      Console.isErrorLevel(logLevel as typeof LogLevel[keyof typeof LogLevel])
+      Console.isErrorLevel(logLevel as (typeof LogLevel)[keyof typeof LogLevel])
     ) {
       result.error = message;
     } else {
@@ -529,7 +527,7 @@ export class Console extends PureComponent<ConsoleProps, ConsoleState> {
       const disableOldObject = (
         object: VariableDefinition,
         isRemoved = false
-      ) => {
+      ): void => {
         const { title } = object;
         assertNotNull(title);
         const oldIndex = objectHistoryMap.get(title);
@@ -616,7 +614,10 @@ export class Console extends PureComponent<ConsoleProps, ConsoleState> {
   scrollConsoleHistoryToBottom(force = false): void {
     const pane = this.consoleHistoryScrollPane.current;
     assertNotNull(pane);
-    if (!force && pane.scrollTop < pane.scrollHeight - pane.offsetHeight) {
+    if (
+      !force &&
+      Math.abs(pane.scrollHeight - pane.clientHeight - pane.scrollTop) >= 1
+    ) {
       return;
     }
 
@@ -733,13 +734,8 @@ export class Console extends PureComponent<ConsoleProps, ConsoleState> {
   }
 
   handleOpenCsvTable(title: string): void {
-    const {
-      dh,
-      openObject,
-      commandHistoryStorage,
-      language,
-      scope,
-    } = this.props;
+    const { dh, openObject, commandHistoryStorage, language, scope } =
+      this.props;
     const { consoleHistory, objectMap } = this.state;
     const object = { name: title, title, type: dh.VariableType.TABLE };
     const isExistingObject = objectMap.has(title);
@@ -772,7 +768,6 @@ export class Console extends PureComponent<ConsoleProps, ConsoleState> {
   addConsoleHistoryMessage(message?: string, error?: string): void {
     const { consoleHistory } = this.state;
     const historyItem = {
-      command: '',
       startTime: Date.now(),
       endTime: Date.now(),
       result: { message, error },

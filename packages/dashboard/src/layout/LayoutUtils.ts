@@ -1,10 +1,14 @@
+import { DragEvent } from 'react';
 import deepEqual from 'deep-equal';
 import shortid from 'shortid';
 import isMatch from 'lodash.ismatch';
-import { DragEvent } from 'react';
 import Log from '@deephaven/log';
-import { isComponent, isRoot, isStack } from '@deephaven/golden-layout';
-import type GoldenLayout from '@deephaven/golden-layout';
+import GoldenLayout, {
+  isComponent,
+  isRoot,
+  isStack,
+  GoldenLayoutThemeExport,
+} from '@deephaven/golden-layout';
 import type {
   ComponentConfig,
   Config,
@@ -18,7 +22,6 @@ import type {
   CloseOptions,
 } from '@deephaven/golden-layout';
 import { assertNotNull } from '@deephaven/utils';
-import GoldenLayoutThemeExport from './GoldenLayoutThemeExport';
 import { DashboardLayoutConfig } from '../DashboardLayout';
 import { PanelConfig } from '../DashboardPlugin';
 
@@ -475,7 +478,7 @@ class LayoutUtils {
       config.id = shortid.generate();
     }
 
-    if (dragEvent) {
+    if (dragEvent != null) {
       root?.layoutManager.createDragSourceFromEvent(config, dragEvent);
       return;
     }
@@ -499,7 +502,7 @@ class LayoutUtils {
       // We need to listen for when the stack is created
       const onComponentCreated = (event: {
         origin: { element: Element[] };
-      }) => {
+      }): void => {
         log.debug('Component created, focusing element', focusElement);
 
         stack.off('componentCreated', onComponentCreated);
@@ -843,7 +846,7 @@ class LayoutUtils {
         resolve();
         return;
       }
-      const onInit = () => {
+      const onInit = (): void => {
         layout.off('initialised', onInit);
         resolve();
       };

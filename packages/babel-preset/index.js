@@ -16,7 +16,7 @@ module.exports = api => ({
         include: ['@babel/plugin-proposal-class-properties'],
       },
     ],
-    '@babel/preset-react',
+    ['@babel/preset-react', { runtime: 'automatic' }],
     ['@babel/preset-typescript', { allowDeclareFields: true }],
   ],
   plugins: [
@@ -41,8 +41,8 @@ module.exports = api => ({
       'transform-rename-import',
       {
         // The babel-plugin-add-import-extension adds the .js to .scss imports, just convert them back to .css
-        original: '^(.+?)\\.s?css.js$',
-        replacement: '$1.css',
+        original: '^(.+?)\\.s?css(\\?inline)?\\.js$',
+        replacement: '$1.css$2',
       },
     ],
   ].filter(Boolean),

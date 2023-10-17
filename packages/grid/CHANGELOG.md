@@ -3,6 +3,71 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.49.0](https://github.com/deephaven/web-client-ui/compare/v0.48.0...v0.49.0) (2023-09-15)
+
+
+### Bug Fixes
+
+* Table overflow button has lower priority than grid tokens ([#1510](https://github.com/deephaven/web-client-ui/issues/1510)) ([32e6d20](https://github.com/deephaven/web-client-ui/commit/32e6d208d0977092f315caa122b8ab23f0fc110a)), closes [#1480](https://github.com/deephaven/web-client-ui/issues/1480)
+
+
+
+
+
+# [0.48.0](https://github.com/deephaven/web-client-ui/compare/v0.47.0...v0.48.0) (2023-09-12)
+
+**Note:** Version bump only for package @deephaven/grid
+
+
+
+
+
+# [0.47.0](https://github.com/deephaven/web-client-ui/compare/v0.46.1...v0.47.0) (2023-09-08)
+
+**Note:** Version bump only for package @deephaven/grid
+
+
+
+
+
+## [0.46.1](https://github.com/deephaven/web-client-ui/compare/v0.46.0...v0.46.1) (2023-09-01)
+
+**Note:** Version bump only for package @deephaven/grid
+
+
+
+
+
+# [0.46.0](https://github.com/deephaven/web-client-ui/compare/v0.45.1...v0.46.0) (2023-08-18)
+
+**Note:** Version bump only for package @deephaven/grid
+
+
+
+
+
+# [0.45.0](https://github.com/deephaven/web-client-ui/compare/v0.44.1...v0.45.0) (2023-07-31)
+
+**Note:** Version bump only for package @deephaven/grid
+
+# [0.44.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.44.0) (2023-07-07)
+
+**Note:** Version bump only for package @deephaven/grid
+
+# [0.43.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.43.0) (2023-07-07)
+
+**Note:** Version bump only for package @deephaven/grid
+
+# [0.42.0](https://github.com/deephaven/web-client-ui/compare/v0.41.1...v0.42.0) (2023-06-29)
+
+### Reverts
+
+- adding back "Table rendering support for databars ([#1212](https://github.com/deephaven/web-client-ui/issues/1212))" ([#1365](https://github.com/deephaven/web-client-ui/issues/1365)) ([8586d4d](https://github.com/deephaven/web-client-ui/commit/8586d4d99e55def1747eb820e824b61703990e58))
+
+# [0.41.0](https://github.com/deephaven/web-client-ui/compare/v0.40.4...v0.41.0) (2023-06-08)
+
+**Note:** Version bump only for package @deephaven/grid
+
 ## [0.40.1](https://github.com/deephaven/web-client-ui/compare/v0.40.0...v0.40.1) (2023-05-24)
 
 **Note:** Version bump only for package @deephaven/grid

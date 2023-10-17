@@ -6,7 +6,6 @@ test.describe.configure({ mode: 'serial' });
 
 async function openSimpleTable(page: Page) {
   const consoleInput = page.locator('.console-input');
-  await consoleInput.click();
 
   const command = makeTableCommand();
 
@@ -22,6 +21,10 @@ async function openSimpleTable(page: Page) {
   );
 
   // Model is loaded, need to make sure table data is also loaded
+  await waitForLoadingDone(page);
+}
+
+async function waitForLoadingDone(page: Page) {
   await expect(
     page.locator('.iris-grid .iris-grid-loading-status')
   ).toHaveCount(0);
@@ -38,7 +41,6 @@ test('can open a simple table', async ({ page }) => {
 test('can open a table with column header groups', async ({ page }) => {
   await page.goto('');
   const consoleInput = page.locator('.console-input');
-  await consoleInput.click();
 
   const command = `${makeTableCommand('column_header_group')}
 column_groups = [{ 'name': 'YandZ', 'children': ['y', 'z'] }, { 'name': 'All', 'children': ['x', 'YandZ'], 'color': 'white' }]
@@ -56,9 +58,7 @@ column_header_group = column_header_group.layout_hints(column_groups=column_grou
   );
 
   // Model is loaded, need to make sure table data is also loaded
-  await expect(
-    page.locator('.iris-grid .iris-grid-loading-status')
-  ).toHaveCount(0);
+  await waitForLoadingDone(page);
 
   // Now we should be able to check the snapshot
   await expect(page.locator('.iris-grid-panel .iris-grid')).toHaveScreenshot();
@@ -69,7 +69,6 @@ test('can open a table with column header groups and hidden columns', async ({
 }) => {
   await page.goto('');
   const consoleInput = page.locator('.console-input');
-  await consoleInput.click();
 
   const command = `${makeTableCommand('column_header_group')}
 column_groups = [{ 'name': 'YandZ', 'children': ['y', 'z'] }, { 'name': 'All', 'children': ['x', 'YandZ'], 'color': 'white' }]
@@ -87,15 +86,13 @@ column_header_group = column_header_group.layout_hints(column_groups=column_grou
   );
 
   // Model is loaded, need to make sure table data is also loaded
-  await expect(
-    page.locator('.iris-grid .iris-grid-loading-status')
-  ).toHaveCount(0);
+  await waitForLoadingDone(page);
 
   // Now we should be able to check the snapshot
   await expect(page.locator('.iris-grid-panel .iris-grid')).toHaveScreenshot();
 });
 
-test.describe('tests table operations', () => {
+test.describe('tests simple table operations', () => {
   let page: Page;
 
   test.beforeAll(async ({ browser }) => {
@@ -266,9 +263,7 @@ test.describe('tests table operations', () => {
     await page.keyboard.type('>37');
 
     // Wait until it's done loading
-    await expect(
-      page.locator('.iris-grid .iris-grid-loading-status')
-    ).toHaveCount(0);
+    await waitForLoadingDone(page);
 
     // Check snapshot
     await expect(page.locator('.iris-grid-column')).toHaveScreenshot();

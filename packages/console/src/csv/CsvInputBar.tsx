@@ -8,7 +8,7 @@ import React, {
 import classNames from 'classnames';
 import type { JSZipObject } from 'jszip';
 import { Button, Checkbox } from '@deephaven/components';
-import { IdeSession, Table } from '@deephaven/jsapi-shim';
+import type { IdeSession, Table } from '@deephaven/jsapi-types';
 import Log from '@deephaven/log';
 import { DbNameValidator } from '@deephaven/utils';
 import CsvOverlay from './CsvOverlay';
@@ -178,7 +178,7 @@ class CsvInputBar extends Component<CsvInputBarProps, CsvInputBarState> {
     }
   }
 
-  handleFile(file: Blob | JSZipObject, isZip = false): void {
+  handleFile(file: File | Blob | JSZipObject, isZip = false): void {
     log.info(
       `Starting CSV parser for ${
         file instanceof File ? file.name : 'pasted values'
@@ -186,7 +186,7 @@ class CsvInputBar extends Component<CsvInputBarProps, CsvInputBarState> {
     );
     const { session, timeZone, onInProgress } = this.props;
     const { tableName, isFirstRowHeaders, type } = this.state;
-    const handleParseDone = (tables: Table[]) => {
+    const handleParseDone = (tables: Table[]): void => {
       // Do not bother merging just one table
       if (tables.length === 1) {
         session
@@ -293,13 +293,8 @@ class CsvInputBar extends Component<CsvInputBarProps, CsvInputBarState> {
 
   render(): ReactElement {
     const { file, paste } = this.props;
-    const {
-      tableName,
-      isFirstRowHeaders,
-      showProgress,
-      progressValue,
-      type,
-    } = this.state;
+    const { tableName, isFirstRowHeaders, showProgress, progressValue, type } =
+      this.state;
     // A blank table name is invalid for pasted values
     const isNameInvalid = Boolean(paste) && !tableName;
     return (

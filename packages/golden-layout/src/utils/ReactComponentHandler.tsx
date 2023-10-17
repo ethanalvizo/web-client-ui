@@ -3,6 +3,13 @@ import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import type ItemContainer from '../container/ItemContainer';
 import type { ReactComponentConfig } from '../config/ItemConfig';
+import { Container } from '../container';
+import EventEmitter from './EventEmitter';
+
+export type GLPanelProps = {
+  glContainer: Container;
+  glEventHub: EventEmitter;
+};
 
 /**
  * A specialised GoldenLayout component that binds GoldenLayout container
@@ -133,10 +140,10 @@ export default class ReactComponentHandler {
       );
     }
 
-    const reactClass = ((this._container.layoutManager.getComponent(
+    const reactClass = (this._container.layoutManager.getComponent(
       componentName
     ) ||
-      this._container.layoutManager.getFallbackComponent()) as unknown) as React.ComponentClass;
+      this._container.layoutManager.getFallbackComponent()) as unknown as React.ComponentClass;
 
     if (!reactClass) {
       throw new Error(
@@ -157,6 +164,16 @@ export default class ReactComponentHandler {
     var defaultProps = {
       glEventHub: this._container.layoutManager.eventHub,
       glContainer: this._container,
+      /**
+       * This ref assignment makes use of callback refs which is a legacy ref style in React.
+       * It uses the callback to inject GoldenLayout _onUpdate into the React componentWillUpdate lifecycle.
+       * This allows GoldenLayout to track the internal state of class components.
+       * We then emit this state change and somewhere furter up, serialize it.
+       * Specifically we look for state.panelState changes.
+       * We should not do this going forward as it's quite unclear where/why your component's state might be saved.
+       * This ref cannot be removed unless we refactor all existing panels to not rely on the magic of panelState.
+       * DashboardUtils#dehydrate is where the panelState gets read/saved.
+       */
       ref: this._gotReactComponent.bind(this),
     };
     var props = $.extend(defaultProps, this._container._config.props);

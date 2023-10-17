@@ -132,6 +132,13 @@ export type GridTheme = {
   // Divider colors between the floating parts and the grid
   floatingDividerOuterColor: GridColor;
   floatingDividerInnerColor: GridColor;
+
+  zeroLineColor: GridColor;
+  positiveBarColor: GridColor;
+  negativeBarColor: GridColor;
+  markerBarColor: GridColor;
+
+  dataBarHorizontalPadding: number;
 };
 
 /**
@@ -221,6 +228,14 @@ const defaultTheme: GridTheme = Object.freeze({
   // Divider colors between the floating parts and the grid
   floatingDividerOuterColor: '#000000',
   floatingDividerInnerColor: '#cccccc',
+
+  // Databar
+  zeroLineColor: '#888888',
+  positiveBarColor: '#00ff00',
+  negativeBarColor: '#ff0000',
+  markerBarColor: '#ffffff',
+
+  dataBarHorizontalPadding: 90,
 });
 
 export default defaultTheme;

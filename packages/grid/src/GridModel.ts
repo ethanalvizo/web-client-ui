@@ -4,6 +4,7 @@ import { ModelIndex } from './GridMetrics';
 import { GridColor, GridTheme, NullableGridColor } from './GridTheme';
 import memoizeClear from './memoizeClear';
 import GridUtils, { Token } from './GridUtils';
+import { CellRenderType } from './CellRenderer';
 
 const LINK_TRUNCATION_LENGTH = 5000;
 
@@ -19,7 +20,7 @@ abstract class GridModel<
     string,
     Event<string>
   >,
-  TMode extends 'standard' | 'strict' = 'standard'
+  TMode extends 'standard' | 'strict' = 'standard',
 > extends EventTarget<TEventMap, TMode> {
   /** Count of rows in the grid */
   abstract get rowCount(): number;
@@ -226,6 +227,10 @@ abstract class GridModel<
       return GridUtils.findTokensWithProtocolInText(contentToCheckForLinks);
     }
   );
+
+  renderTypeForCell(column: ModelIndex, row: ModelIndex): CellRenderType {
+    return 'text';
+  }
 }
 
 export default GridModel;

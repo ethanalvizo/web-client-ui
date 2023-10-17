@@ -3,6 +3,7 @@
 import memoize from 'memoize-one';
 import throttle from 'lodash.throttle';
 import {
+  CellRenderType,
   EditOperation,
   GridRange,
   GridUtils,
@@ -38,6 +39,13 @@ import {
   assertNotNull,
 } from '@deephaven/utils';
 import { TableUtils, Formatter, FormatterUtils } from '@deephaven/jsapi-utils';
+import {
+  AxisOption,
+  DataBarOptions,
+  DirectionOption,
+  Marker,
+  ValuePlacementOption,
+} from 'packages/grid/src/DataBarGridModel';
 import IrisGridModel from './IrisGridModel';
 import AggregationOperation from './sidebar/aggregations/AggregationOperation';
 import IrisGridUtils from './IrisGridUtils';
@@ -73,7 +81,7 @@ export function isIrisGridTableModelTemplate(
 
 class IrisGridTableModelTemplate<
   T extends TableTemplate<T> = Table,
-  R extends UIRow = UIRow
+  R extends UIRow = UIRow,
 > extends IrisGridModel {
   static ROW_BUFFER_PAGES = 1;
 
@@ -213,9 +221,8 @@ class IrisGridTableModelTemplate<
     this.handleTableUpdate = this.handleTableUpdate.bind(this);
     this.handleTotalsUpdate = this.handleTotalsUpdate.bind(this);
     this.handleRequestFailed = this.handleRequestFailed.bind(this);
-    this.handleCustomColumnsChanged = this.handleCustomColumnsChanged.bind(
-      this
-    );
+    this.handleCustomColumnsChanged =
+      this.handleCustomColumnsChanged.bind(this);
 
     this.dh = dh;
     this.irisFormatter = formatter;
@@ -496,7 +503,7 @@ class IrisGridTableModelTemplate<
     }
   }
 
-  textValueForCell(x: ModelIndex, y: ModelIndex): string | null {
+  textValueForCell(x: ModelIndex, y: ModelIndex): string | null | undefined {
     // First check if there's any pending values we should read from
     if (this.pendingStringData[x]?.[y] !== undefined) {
       return this.pendingStringData[x][y];
@@ -505,8 +512,11 @@ class IrisGridTableModelTemplate<
     // Use a separate cache from memoization just for the strings that are currently displayed
     if (this.formattedStringData[x]?.[y] === undefined) {
       const value = this.valueForCell(x, y);
-      if (value == null) {
+      if (value === null) {
         return null;
+      }
+      if (value === undefined) {
+        return undefined;
       }
 
       const column = this.totalsColumn(x, y) ?? this.columns[x];
@@ -543,6 +553,17 @@ class IrisGridTableModelTemplate<
         return '*';
       }
     }
+
+    if (TableUtils.isTextType(this.columns[x]?.type)) {
+      if (text === null) {
+        return 'null';
+      }
+
+      if (text === '') {
+        return 'empty';
+      }
+    }
+
     return text ?? '';
   }
 
@@ -620,6 +641,54 @@ class IrisGridTableModelTemplate<
       return 'center';
     }
     return 'left';
+  }
+
+  dataBarOptionsForCell(
+    column: ModelIndex,
+    row: ModelIndex,
+    theme: IrisGridThemeType
+  ): DataBarOptions {
+    const format = this.formatForCell(column, row);
+    assertNotNull(format);
+    const { axis, direction, max, min, valuePlacement, value, marker } =
+      format.formatDataBar;
+    let { positiveColor, negativeColor, markerColor, opacity } =
+      format.formatDataBar;
+
+    positiveColor = positiveColor ?? theme.positiveBarColor;
+    negativeColor = negativeColor ?? theme.negativeBarColor;
+    let databarColor: string | string[] =
+      format.color ?? (value >= 0 ? positiveColor : negativeColor);
+    if (databarColor.includes(',')) {
+      databarColor = databarColor.split(',');
+    }
+    markerColor = markerColor ?? theme.markerBarColor;
+
+    opacity = valuePlacement.toLowerCase() === 'overlap' ? 0.5 : opacity;
+
+    const databarOptions = {
+      axis: axis.toLowerCase() as AxisOption,
+      direction: direction.toUpperCase() as DirectionOption,
+      columnMax: max,
+      columnMin: min,
+      opacity,
+      color: databarColor,
+      valuePlacement: valuePlacement.toLowerCase() as ValuePlacementOption,
+      value,
+      markers: [
+        {
+          value: marker,
+          color: markerColor,
+        },
+      ] as Marker[],
+    };
+
+    return databarOptions;
+  }
+
+  renderTypeForCell(column: ModelIndex, row: ModelIndex): CellRenderType {
+    const format = this.formatForCell(column, row);
+    return format?.formatDataBar != null ? 'dataBar' : 'text';
   }
 
   textForColumnHeader(x: ModelIndex, depth = 0): string | undefined {
@@ -708,7 +777,7 @@ class IrisGridTableModelTemplate<
         layoutHints?.columnGroups ?? []
       );
 
-      const moveColumn = (name: string, toIndex: VisibleIndex) => {
+      const moveColumn = (name: string, toIndex: VisibleIndex): void => {
         const modelIndex = this.getColumnIndexByName(name);
         if (modelIndex == null) {
           throw new Error(`Unknown layout hint column: ${name}`);
@@ -720,7 +789,7 @@ class IrisGridTableModelTemplate<
         movedColumns = GridUtils.moveItem(visibleIndex, toIndex, movedColumns);
       };
 
-      const moveGroup = (name: string, toIndex: VisibleIndex) => {
+      const moveGroup = (name: string, toIndex: VisibleIndex): void => {
         const group = groupMap.get(name);
         if (group == null) {
           throw new Error(`Unknown layout hint group: ${name}`);
@@ -1063,10 +1132,8 @@ class IrisGridTableModelTemplate<
     const operationMap = this.totals?.operationMap;
     for (let c = 0; c < columns.length; c += 1) {
       const column = columns[c];
-      const [
-        name,
-        operation = operationMap?.[name]?.[0] ?? defaultOperation,
-      ] = column.name.split('__');
+      const [name, operation = operationMap?.[name]?.[0] ?? defaultOperation] =
+        column.name.split('__');
       if (!dataMap.has(operation)) {
         dataMap.set(operation, { data: new Map() });
       }
@@ -1507,19 +1574,18 @@ class IrisGridTableModelTemplate<
     { max: 10000 }
   );
 
-  getCachedViewportRowRange = memoize((top: number, bottom: number): [
-    number,
-    number
-  ] => {
-    const viewHeight = bottom - top;
-    const viewportTop = Math.max(
-      0,
-      top - viewHeight * IrisGridTableModelTemplate.ROW_BUFFER_PAGES
-    );
-    const viewportBottom =
-      bottom + viewHeight * IrisGridTableModelTemplate.ROW_BUFFER_PAGES;
-    return [viewportTop, viewportBottom];
-  });
+  getCachedViewportRowRange = memoize(
+    (top: number, bottom: number): [number, number] => {
+      const viewHeight = bottom - top;
+      const viewportTop = Math.max(
+        0,
+        top - viewHeight * IrisGridTableModelTemplate.ROW_BUFFER_PAGES
+      );
+      const viewportBottom =
+        bottom + viewHeight * IrisGridTableModelTemplate.ROW_BUFFER_PAGES;
+      return [viewportTop, viewportBottom];
+    }
+  );
 
   getCachedPendingErrors = memoize(
     (
@@ -1565,6 +1631,10 @@ class IrisGridTableModelTemplate<
       return false;
     }
     return !this.isKeyColumn(modelIndex);
+  }
+
+  isColumnSortable(modelIndex: ModelIndex): boolean {
+    return this.columns[modelIndex].isSortable ?? true;
   }
 
   isKeyColumn(x: ModelIndex): boolean {
@@ -2011,7 +2081,7 @@ class IrisGridTableModelTemplate<
     }
   }
 
-  editValueForCell(x: ModelIndex, y: ModelIndex): string | null {
+  editValueForCell(x: ModelIndex, y: ModelIndex): string | null | undefined {
     return this.textValueForCell(x, y);
   }
 

@@ -1,3 +1,4 @@
+import deepEqual from 'deep-equal';
 import { GridUtils, GridRange, MoveOperation } from '@deephaven/grid';
 import dh from '@deephaven/jsapi-shim';
 import type { Column, Table, Sort } from '@deephaven/jsapi-types';
@@ -397,13 +398,13 @@ describe('getPrevVisibleColumns', () => {
   });
 
   it('skips hidden columns', () => {
-    expect(
-      IrisGridUtils.getPrevVisibleColumns(columns, 2, 2, [], [1])
-    ).toEqual([makeColumn(0), makeColumn(2)]);
+    expect(IrisGridUtils.getPrevVisibleColumns(columns, 2, 2, [], [1])).toEqual(
+      [makeColumn(0), makeColumn(2)]
+    );
 
-    expect(
-      IrisGridUtils.getPrevVisibleColumns(columns, 3, 5, [], [1])
-    ).toEqual([makeColumn(0), makeColumn(2), makeColumn(3)]);
+    expect(IrisGridUtils.getPrevVisibleColumns(columns, 3, 5, [], [1])).toEqual(
+      [makeColumn(0), makeColumn(2), makeColumn(3)]
+    );
   });
 });
 
@@ -422,13 +423,13 @@ describe('getNextVisibleColumns', () => {
   });
 
   it('skips hidden columns 2', () => {
-    expect(
-      IrisGridUtils.getNextVisibleColumns(columns, 1, 2, [], [2])
-    ).toEqual([makeColumn(1), makeColumn(3)]);
+    expect(IrisGridUtils.getNextVisibleColumns(columns, 1, 2, [], [2])).toEqual(
+      [makeColumn(1), makeColumn(3)]
+    );
 
-    expect(
-      IrisGridUtils.getNextVisibleColumns(columns, 1, 5, [], [2])
-    ).toEqual([makeColumn(1), makeColumn(3), makeColumn(4)]);
+    expect(IrisGridUtils.getNextVisibleColumns(columns, 1, 5, [], [2])).toEqual(
+      [makeColumn(1), makeColumn(3), makeColumn(4)]
+    );
   });
 });
 
@@ -648,5 +649,34 @@ describe('convert other column types to text', () => {
         'io.deephaven.time.DateTime'
       )
     ).toEqual('2022-02-03 02:14:59.000');
+  });
+});
+
+describe('dehydration methods', () => {
+  it.each([
+    [
+      'dehydrateIrisGridPanelState',
+      IrisGridUtils.dehydrateIrisGridPanelState(irisGridTestUtils.makeModel(), {
+        isSelectingPartition: false,
+        partition: null,
+        partitionColumn: null,
+        advancedSettings: new Map(),
+      }),
+    ],
+    [
+      'dehydrateIrisGridState',
+      IrisGridUtils.dehydrateGridState(irisGridTestUtils.makeModel(), {
+        isStuckToBottom: false,
+        isStuckToRight: false,
+        movedRows: [],
+        movedColumns: [],
+      }),
+    ],
+  ])('%s should be serializable', (_label, result) => {
+    expect(
+      // This makes sure the result doesn't contain undefined
+      // so it can be serialized and de-serialized without changes
+      deepEqual(result, JSON.parse(JSON.stringify(result)), { strict: true })
+    ).toBe(true);
   });
 });

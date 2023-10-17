@@ -10,16 +10,17 @@ import memoize from 'memoize-one';
 import { connect } from 'react-redux';
 import debounce from 'lodash.debounce';
 import {
+  DashboardPanelProps,
   DEFAULT_DASHBOARD_ID,
   LayoutUtils,
   PanelComponent,
+  PanelMetadata,
 } from '@deephaven/dashboard';
 import {
   AdvancedSettings,
   IrisGrid,
   IrisGridModel,
   IrisGridUtils,
-  IrisGridTableModel,
   isIrisGridTableModelTemplate,
   ColumnName,
   PendingDataMap,
@@ -39,6 +40,8 @@ import {
   ChartBuilderSettings,
   DehydratedIrisGridState,
   ColumnHeaderGroup,
+  IrisGridContextMenuData,
+  IrisGridTableModel,
 } from '@deephaven/iris-grid';
 import {
   AdvancedFilterOptions,
@@ -60,16 +63,21 @@ import {
   CancelablePromise,
   PromiseUtils,
 } from '@deephaven/utils';
-import { ContextAction, ContextMenuRoot } from '@deephaven/components';
+import {
+  ContextMenuRoot,
+  ResolvableContextAction,
+} from '@deephaven/components';
 import type { Column, FilterCondition, Sort } from '@deephaven/jsapi-types';
 import {
-  GridRangeIndex,
   GridState,
   ModelIndex,
   ModelSizeMap,
   MoveOperation,
 } from '@deephaven/grid';
-import type { Container, EventEmitter } from '@deephaven/golden-layout';
+import type {
+  TablePluginComponent,
+  TablePluginElement,
+} from '@deephaven/plugin';
 import { ConsoleEvent, InputFilterEvent, IrisGridEvent } from '../events';
 import {
   getInputFiltersForDashboard,
@@ -80,6 +88,10 @@ import WidgetPanel from './WidgetPanel';
 import './IrisGridPanel.scss';
 import { Link, LinkColumn } from '../linker/LinkerUtils';
 import IrisGridPanelTooltip from './IrisGridPanelTooltip';
+import {
+  isIrisGridPanelMetadata,
+  isLegacyIrisGridPanelMetadata,
+} from './IrisGridPanelTypes';
 
 const log = Log.module('IrisGridPanel');
 
@@ -90,13 +102,6 @@ const PLUGIN_COMPONENTS = { IrisGrid, IrisGridTableModel, ContextMenuRoot };
 type ModelQueueFunction = (model: IrisGridModel) => void;
 
 type ModelQueue = ModelQueueFunction[];
-
-interface Metadata {
-  table: string;
-  type?: string;
-  query?: string;
-  querySerial?: string;
-}
 
 export interface PanelState {
   gridState: {
@@ -110,20 +115,27 @@ export interface PanelState {
   };
   irisGridState: DehydratedIrisGridState;
   irisGridPanelState: {
-    partitionColumn: ColumnName | undefined;
-    partition: string | undefined;
+    partitionColumn: ColumnName | null;
+    partition: string | null;
     isSelectingPartition: boolean;
     advancedSettings: [AdvancedSettingsType, boolean][];
   };
   pluginState: unknown;
 }
 
-export interface IrisGridPanelProps {
+// Some of the properties in the loaded panel state may be omitted
+// even though they can't be undefined in the dehydrated state.
+// This can happen when loading the state saved before the properties were added.
+type LoadedPanelState = PanelState & {
+  irisGridPanelState: PanelState['irisGridPanelState'] &
+    Partial<
+      Pick<PanelState['irisGridPanelState'], 'partition' | 'partitionColumn'>
+    >;
+};
+
+export interface IrisGridPanelProps extends DashboardPanelProps {
   children?: ReactNode;
-  glContainer: Container;
-  glEventHub: EventEmitter;
-  metadata: Metadata;
-  panelState: PanelState | null;
+  panelState: LoadedPanelState | null;
   makeModel: () => IrisGridModel | Promise<IrisGridModel>;
   inputFilters: InputFilter[];
   links: Link[];
@@ -141,7 +153,7 @@ export interface IrisGridPanelProps {
   getDownloadWorker: () => Promise<ServiceWorker>;
 
   // Load a plugin defined by the table
-  loadPlugin: (pluginName: string) => Plugin;
+  loadPlugin: (pluginName: string) => TablePluginComponent;
 
   theme: IrisGridThemeType;
 }
@@ -174,14 +186,14 @@ interface IrisGridPanelState {
   movedColumns: readonly MoveOperation[];
   movedRows: readonly MoveOperation[];
   isSelectingPartition: boolean;
-  partition?: string;
-  partitionColumn?: Column;
+  partition: string | null;
+  partitionColumn: Column | null;
   rollupConfig?: UIRollupConfig;
   showSearchBar: boolean;
   searchValue: string;
   selectedSearchColumns?: readonly string[];
   invertSearchColumns: boolean;
-  Plugin?: Plugin;
+  Plugin?: TablePluginComponent;
   pluginFilters: readonly FilterCondition[];
   pluginFetchColumns: readonly string[];
   modelQueue: ModelQueue;
@@ -193,6 +205,20 @@ interface IrisGridPanelState {
   panelState: PanelState | null; // Dehydrated panel state that can load this panel
   irisGridStateOverrides: Partial<DehydratedIrisGridState>;
   gridStateOverrides: Partial<GridState>;
+}
+
+function getTableNameFromMetadata(metadata: PanelMetadata | undefined): string {
+  if (metadata == null) {
+    throw new Error('No metadata provided');
+  }
+  if (isIrisGridPanelMetadata(metadata)) {
+    return metadata.name;
+  }
+  if (isLegacyIrisGridPanelMetadata(metadata)) {
+    return metadata.table;
+  }
+
+  throw new Error(`Unable to determine table name from metadata: ${metadata}`);
 }
 
 export class IrisGridPanel extends PureComponent<
@@ -211,9 +237,8 @@ export class IrisGridPanel extends PureComponent<
   constructor(props: IrisGridPanelProps) {
     super(props);
 
-    this.handleAdvancedSettingsChange = this.handleAdvancedSettingsChange.bind(
-      this
-    );
+    this.handleAdvancedSettingsChange =
+      this.handleAdvancedSettingsChange.bind(this);
     this.handleColumnsChanged = this.handleColumnsChanged.bind(this);
     this.handleTableChanged = this.handleTableChanged.bind(this);
     this.handleColumnSelected = this.handleColumnSelected.bind(this);
@@ -267,8 +292,8 @@ export class IrisGridPanel extends PureComponent<
       movedColumns: [],
       movedRows: [],
       isSelectingPartition: false,
-      partition: undefined,
-      partitionColumn: undefined,
+      partition: null,
+      partitionColumn: null,
       rollupConfig: undefined,
       showSearchBar: false,
       searchValue: '',
@@ -326,8 +351,7 @@ export class IrisGridPanel extends PureComponent<
 
   irisGrid: RefObject<IrisGrid>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  pluginRef: RefObject<any>;
+  pluginRef: RefObject<TablePluginElement>;
 
   modelPromise?: CancelablePromise<IrisGridModel>;
 
@@ -341,7 +365,7 @@ export class IrisGridPanel extends PureComponent<
 
   getTableName(): string {
     const { metadata } = this.props;
-    return metadata.table;
+    return getTableNameFromMetadata(metadata);
   }
 
   getGridInputFilters = memoize(
@@ -380,8 +404,7 @@ export class IrisGridPanel extends PureComponent<
 
   getPluginContent = memoize(
     (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      Plugin: any,
+      Plugin: TablePluginComponent | undefined,
       model: IrisGridModel | undefined,
       user: User,
       workspace: Workspace,
@@ -396,23 +419,31 @@ export class IrisGridPanel extends PureComponent<
         return null;
       }
 
+      // The panel in the deprecated props makes an ugly dependency of the plugin on the panel
+      // Since we didn't have TS when the old plugins would have been implemented,
+      // just pass the deprecated props without type checking
+      // so we can break the ugly dependency of plugin on panel
+      const deprecatedProps = {
+        panel: this,
+        onFilter: this.handlePluginFilter,
+        onFetchColumns: this.handlePluginFetchColumns,
+        user,
+        workspace,
+        components: PLUGIN_COMPONENTS,
+      };
+
       return (
         <div className="iris-grid-plugin">
           <Plugin
             ref={this.pluginRef}
             filter={this.handlePluginFilter}
-            // onFilter is deprecated
-            onFilter={this.handlePluginFilter}
             fetchColumns={this.handlePluginFetchColumns}
-            // onFetchColumns is deprecated
-            onFetchColumns={this.handlePluginFetchColumns}
+            model={model}
             table={model.table}
-            user={user}
-            panel={this}
-            workspace={workspace}
-            components={PLUGIN_COMPONENTS}
             onStateChange={this.handlePluginStateChange}
             pluginState={pluginState}
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...deprecatedProps}
           />
         </div>
       );
@@ -423,8 +454,8 @@ export class IrisGridPanel extends PureComponent<
     (
       model: IrisGridModel,
       isSelectingPartition: boolean,
-      partition: string | undefined,
-      partitionColumn: Column | undefined,
+      partition: string | null,
+      partitionColumn: Column | null,
       advancedSettings: Map<AdvancedSettingsType, boolean>
     ) =>
       IrisGridUtils.dehydrateIrisGridPanelState(model, {
@@ -620,17 +651,8 @@ export class IrisGridPanel extends PureComponent<
     this.setState({ pluginFetchColumns });
   }
 
-  handleContextMenu(obj: {
-    model: IrisGridModel;
-    value: unknown;
-    valueText: string | null;
-    column: Column;
-    rowIndex: GridRangeIndex;
-    columnIndex: GridRangeIndex;
-    modelRow: GridRangeIndex;
-    modelColumn: GridRangeIndex;
-  }): ContextAction {
-    return this.pluginRef.current?.getMenu?.(obj) ?? [];
+  handleContextMenu(data: IrisGridContextMenuData): ResolvableContextAction[] {
+    return this.pluginRef.current?.getMenu?.(data) ?? [];
   }
 
   isColumnSelectionValid(tableColumn: Column | null): boolean {
@@ -710,8 +732,8 @@ export class IrisGridPanel extends PureComponent<
     this.setState(
       () => null,
       () => {
-        const { glEventHub, inputFilters, metadata } = this.props;
-        const { table } = metadata;
+        const { glEventHub, inputFilters } = this.props;
+        const table = this.getTableName();
         const { panelState } = this.state;
         const sourcePanelId = LayoutUtils.getIdFromPanel(this);
         let tableSettings;
@@ -935,10 +957,11 @@ export class IrisGridPanel extends PureComponent<
       model.columns,
       quickFilters
     ).filter(([columnIndex]) => model.isFilterable(columnIndex));
-    const indexedAdvancedFilters = IrisGridUtils.changeFilterColumnNamesToIndexes(
-      model.columns,
-      advancedFilters
-    ).filter(([columnIndex]) => model.isFilterable(columnIndex));
+    const indexedAdvancedFilters =
+      IrisGridUtils.changeFilterColumnNamesToIndexes(
+        model.columns,
+        advancedFilters
+      ).filter(([columnIndex]) => model.isFilterable(columnIndex));
     assertNotNull(this.irisGridUtils);
     irisGrid.clearAllFilters();
     irisGrid.setFilters({
@@ -992,24 +1015,26 @@ export class IrisGridPanel extends PureComponent<
         advancedFilters: savedAdvancedFilters,
       } = irisGridStateOverrides;
       if (savedQuickFilters) {
-        irisGridStateOverrides.quickFilters = IrisGridUtils.changeFilterColumnNamesToIndexes(
-          model.columns,
-          (savedQuickFilters as unknown) as {
-            name: string;
-            filter: {
-              text: string;
-            };
-          }[]
-        );
+        irisGridStateOverrides.quickFilters =
+          IrisGridUtils.changeFilterColumnNamesToIndexes(
+            model.columns,
+            savedQuickFilters as unknown as {
+              name: string;
+              filter: {
+                text: string;
+              };
+            }[]
+          );
       }
       if (savedAdvancedFilters) {
-        irisGridStateOverrides.advancedFilters = IrisGridUtils.changeFilterColumnNamesToIndexes(
-          model.columns,
-          (savedAdvancedFilters as unknown) as {
-            name: string;
-            filter: { options: AdvancedFilterOptions };
-          }[]
-        );
+        irisGridStateOverrides.advancedFilters =
+          IrisGridUtils.changeFilterColumnNamesToIndexes(
+            model.columns,
+            savedAdvancedFilters as unknown as {
+              name: string;
+              filter: { options: AdvancedFilterOptions };
+            }[]
+          );
       }
       const {
         isSelectingPartition,
@@ -1043,16 +1068,12 @@ export class IrisGridPanel extends PureComponent<
         ...irisGridState,
         ...irisGridStateOverrides,
       });
-      const {
-        isStuckToBottom,
-        isStuckToRight,
-        movedColumns,
-        movedRows,
-      } = IrisGridUtils.hydrateGridState(
-        model,
-        { ...gridState, ...gridStateOverrides },
-        irisGridState.customColumns
-      );
+      const { isStuckToBottom, isStuckToRight, movedColumns, movedRows } =
+        IrisGridUtils.hydrateGridState(
+          model,
+          { ...gridState, ...gridStateOverrides },
+          irisGridState.customColumns
+        );
       this.setState({
         advancedFilters,
         advancedSettings,
@@ -1125,12 +1146,8 @@ export class IrisGridPanel extends PureComponent<
     assertNotNull(metrics);
     const { userColumnWidths, userRowHeights } = metrics;
     assertNotNull(gridState);
-    const {
-      isStuckToBottom,
-      isStuckToRight,
-      movedColumns,
-      movedRows,
-    } = gridState;
+    const { isStuckToBottom, isStuckToRight, movedColumns, movedRows } =
+      gridState;
 
     const panelState = this.getCachedPanelState(
       this.getDehydratedIrisGridPanelState(
@@ -1246,7 +1263,7 @@ export class IrisGridPanel extends PureComponent<
     } = this.state;
     const errorMessage =
       error != null ? `Unable to open table. ${error}` : undefined;
-    const { table: name } = metadata;
+    const name = getTableNameFromMetadata(metadata);
     const description = model?.description ?? undefined;
     const pluginState = panelState?.pluginState ?? null;
     const childrenContent =
@@ -1350,7 +1367,15 @@ export class IrisGridPanel extends PureComponent<
 const mapStateToProps = (
   state: RootState,
   { localDashboardId = DEFAULT_DASHBOARD_ID }: { localDashboardId?: string }
-) => ({
+): Pick<
+  IrisGridPanelProps,
+  | 'columnSelectionValidator'
+  | 'inputFilters'
+  | 'links'
+  | 'settings'
+  | 'user'
+  | 'workspace'
+> => ({
   inputFilters: getInputFiltersForDashboard(state, localDashboardId),
   links: getLinksForDashboard(state, localDashboardId),
   columnSelectionValidator: getColumnSelectionValidatorForDashboard(

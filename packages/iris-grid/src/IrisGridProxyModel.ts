@@ -273,6 +273,10 @@ class IrisGridProxyModel extends IrisGridModel {
     return this.model.isColumnFrozen(x);
   }
 
+  isColumnSortable(index: number): boolean {
+    return this.model.isColumnSortable(index);
+  }
+
   get hasExpandableRows(): boolean {
     if (isExpandableGridModel(this.model)) {
       return this.model.hasExpandableRows;
@@ -457,6 +461,12 @@ class IrisGridProxyModel extends IrisGridModel {
 
   valueForCell: IrisGridModel['valueForCell'] = (...args) =>
     this.model.valueForCell(...args);
+
+  renderTypeForCell: IrisGridModel['renderTypeForCell'] = (...args) =>
+    this.model.renderTypeForCell(...args);
+
+  dataBarOptionsForCell: IrisGridModel['dataBarOptionsForCell'] = (...args) =>
+    this.model.dataBarOptionsForCell(...args);
 
   get filter(): readonly FilterCondition[] {
     return this.model.filter;

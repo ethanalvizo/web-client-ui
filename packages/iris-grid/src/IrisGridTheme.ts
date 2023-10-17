@@ -135,6 +135,11 @@ const theme: Partial<IrisGridThemeType> = Object.freeze({
 
   overflowButtonColor: IrisGridTheme['overflow-button-color'],
   overflowButtonHoverColor: IrisGridTheme['overflow-button-hover-color'],
+
+  zeroLineColor: IrisGridTheme['zero-line-color'],
+  positiveBarColor: IrisGridTheme['positive-bar-color'],
+  negativeBarColor: IrisGridTheme['negative-bar-color'],
+  markerBarColor: IrisGridTheme['marker-bar-color'],
 });
 
 export default theme;

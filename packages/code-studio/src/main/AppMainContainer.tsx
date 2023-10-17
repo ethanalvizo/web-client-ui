@@ -4,7 +4,6 @@ import React, {
   Component,
   ReactElement,
   RefObject,
-  ForwardRefExoticComponent,
 } from 'react';
 import classNames from 'classnames';
 import memoize from 'memoize-one';
@@ -24,50 +23,38 @@ import {
   BasicModal,
   DebouncedModal,
 } from '@deephaven/components';
-import {
-  IrisGridModel,
-  SHORTCUTS as IRIS_GRID_SHORTCUTS,
-} from '@deephaven/iris-grid';
+import { SHORTCUTS as IRIS_GRID_SHORTCUTS } from '@deephaven/iris-grid';
 import {
   ClosedPanels,
   Dashboard,
   DashboardLayoutConfig,
-  DashboardPanelProps,
   DashboardUtils,
   DEFAULT_DASHBOARD_ID,
+  DehydratedDashboardPanelProps,
   getDashboardData,
   PanelEvent,
-  PanelProps,
   updateDashboardData as updateDashboardDataAction,
 } from '@deephaven/dashboard';
 import {
-  ChartPlugin,
   ConsolePlugin,
-  FilterPlugin,
-  GridPlugin,
   InputFilterEvent,
-  LinkerPlugin,
   MarkdownEvent,
   NotebookEvent,
-  MarkdownPlugin,
-  PandasPlugin,
   getDashboardSessionWrapper,
   ControlType,
   ToolType,
-  ChartBuilderPlugin,
   FilterSet,
   Link,
-  ChartPanelProps,
-  PandasPanelProps,
-  IrisGridPanelProps,
   ColumnSelectionValidator,
   getDashboardConnection,
+  NotebookPanel,
 } from '@deephaven/dashboard-core-plugins';
 import {
   vsGear,
   dhShapes,
   dhPanels,
   vsDebugDisconnect,
+  dhSquareFilled,
 } from '@deephaven/icons';
 import dh from '@deephaven/jsapi-shim';
 import type {
@@ -91,9 +78,15 @@ import {
   ServerConfigValues,
   DeephavenPluginModuleMap,
 } from '@deephaven/redux';
-import { PromiseUtils } from '@deephaven/utils';
+import { bindAllMethods, PromiseUtils } from '@deephaven/utils';
 import GoldenLayout from '@deephaven/golden-layout';
 import type { ItemConfigType } from '@deephaven/golden-layout';
+import {
+  type DashboardPlugin,
+  isDashboardPlugin,
+  type LegacyDashboardPlugin,
+  isLegacyDashboardPlugin,
+} from '@deephaven/plugin';
 import JSZip from 'jszip';
 import SettingsMenu from '../settings/SettingsMenu';
 import AppControlsMenu from './AppControlsMenu';
@@ -101,14 +94,8 @@ import { getLayoutStorage, getServerConfigValues } from '../redux';
 import Logo from '../settings/community-wordmark-app.svg';
 import './AppMainContainer.scss';
 import WidgetList, { WindowMouseEvent } from './WidgetList';
-import {
-  createChartModel,
-  createGridModel,
-  GridPanelMetadata,
-} from './WidgetUtils';
 import EmptyDashboard from './EmptyDashboard';
 import UserLayoutUtils from './UserLayoutUtils';
-import DownloadServiceWorkerUtils from '../DownloadServiceWorkerUtils';
 import LayoutStorage from '../storage/LayoutStorage';
 
 const log = Log.module('AppMainContainer');
@@ -153,7 +140,9 @@ interface AppMainContainerState {
   isAuthFailed: boolean;
   isDisconnected: boolean;
   isPanelsMenuShown: boolean;
+  isResetLayoutPromptShown: boolean;
   isSettingsMenuShown: boolean;
+  unsavedNotebookCount: number;
   widgets: VariableDefinition[];
 }
 
@@ -169,7 +158,10 @@ export class AppMainContainer extends Component<
     event.returnValue = '';
   }
 
-  static hydrateConsole(props: PanelProps, id: string): DashboardPanelProps {
+  static hydrateConsole(
+    props: DehydratedDashboardPanelProps,
+    id: string
+  ): DehydratedDashboardPanelProps {
     return DashboardUtils.hydrate(
       {
         ...props,
@@ -180,40 +172,15 @@ export class AppMainContainer extends Component<
     );
   }
 
-  static handleRefresh() {
+  static handleRefresh(): void {
     log.info('Refreshing application');
     window.location.reload();
   }
 
   constructor(props: AppMainContainerProps & RouteComponentProps) {
     super(props);
-    this.handleSettingsMenuHide = this.handleSettingsMenuHide.bind(this);
-    this.handleSettingsMenuShow = this.handleSettingsMenuShow.bind(this);
-    this.handleError = this.handleError.bind(this);
-    this.handleControlSelect = this.handleControlSelect.bind(this);
-    this.handleToolSelect = this.handleToolSelect.bind(this);
-    this.handleClearFilter = this.handleClearFilter.bind(this);
-    this.handleDataChange = this.handleDataChange.bind(this);
-    this.handleAutoFillClick = this.handleAutoFillClick.bind(this);
-    this.handleGoldenLayoutChange = this.handleGoldenLayoutChange.bind(this);
-    this.handleLayoutConfigChange = this.handleLayoutConfigChange.bind(this);
-    this.handleExportLayoutClick = this.handleExportLayoutClick.bind(this);
-    this.handleImportLayoutClick = this.handleImportLayoutClick.bind(this);
-    this.handleImportLayoutFiles = this.handleImportLayoutFiles.bind(this);
-    this.handleLoadTablePlugin = this.handleLoadTablePlugin.bind(this);
-    this.handleResetLayoutClick = this.handleResetLayoutClick.bind(this);
-    this.handleWidgetMenuClick = this.handleWidgetMenuClick.bind(this);
-    this.handleWidgetsMenuClose = this.handleWidgetsMenuClose.bind(this);
-    this.handleWidgetSelect = this.handleWidgetSelect.bind(this);
-    this.handlePaste = this.handlePaste.bind(this);
-    this.hydrateChart = this.hydrateChart.bind(this);
-    this.hydrateGrid = this.hydrateGrid.bind(this);
-    this.hydratePandas = this.hydratePandas.bind(this);
-    this.hydrateDefault = this.hydrateDefault.bind(this);
-    this.openNotebookFromURL = this.openNotebookFromURL.bind(this);
-    this.handleDisconnect = this.handleDisconnect.bind(this);
-    this.handleReconnect = this.handleReconnect.bind(this);
-    this.handleReconnectAuthFailed = this.handleReconnectAuthFailed.bind(this);
+
+    bindAllMethods(this);
 
     this.importElement = React.createRef();
 
@@ -246,7 +213,9 @@ export class AppMainContainer extends Component<
       isAuthFailed: false,
       isDisconnected: false,
       isPanelsMenuShown: false,
+      isResetLayoutPromptShown: false,
       isSettingsMenuShown: false,
+      unsavedNotebookCount: 0,
       widgets: [],
     };
   }
@@ -362,6 +331,20 @@ export class AppMainContainer extends Component<
     this.goldenLayout?.eventHub.emit(event, ...args);
   }
 
+  handleCancelResetLayoutPrompt(): void {
+    this.setState({
+      isResetLayoutPromptShown: false,
+    });
+  }
+
+  handleConfirmResetLayoutPrompt(): void {
+    this.setState({
+      isResetLayoutPromptShown: false,
+    });
+
+    this.resetLayout();
+  }
+
   // eslint-disable-next-line class-methods-use-this
   handleError(error: unknown): void {
     if (PromiseUtils.isCanceled(error)) {
@@ -378,10 +361,7 @@ export class AppMainContainer extends Component<
     this.setState({ isSettingsMenuShown: true });
   }
 
-  handleControlSelect(
-    type: string,
-    dragEvent: KeyboardEvent | null = null
-  ): void {
+  handleControlSelect(type: string, dragEvent?: KeyboardEvent): void {
     log.debug('handleControlSelect', type);
 
     switch (type) {
@@ -535,9 +515,11 @@ export class AppMainContainer extends Component<
   handleResetLayoutClick(): void {
     log.info('handleResetLayoutClick');
 
-    this.setState({ isPanelsMenuShown: false });
-
-    this.resetLayout();
+    this.setState({
+      isPanelsMenuShown: false,
+      isResetLayoutPromptShown: true,
+      unsavedNotebookCount: NotebookPanel.unsavedNotebookCount(),
+    });
   }
 
   handleImportLayoutFiles(event: ChangeEvent<HTMLInputElement>): void {
@@ -549,17 +531,17 @@ export class AppMainContainer extends Component<
     }
   }
 
-  handleDisconnect() {
+  handleDisconnect(): void {
     log.info('Disconnected from server');
     this.setState({ isDisconnected: true });
   }
 
-  handleReconnect() {
+  handleReconnect(): void {
     log.info('Reconnected to server');
     this.setState({ isDisconnected: false });
   }
 
-  handleReconnectAuthFailed() {
+  handleReconnectAuthFailed(): void {
     log.warn('Reconnect authentication failed');
     this.setState({ isAuthFailed: true });
   }
@@ -573,11 +555,8 @@ export class AppMainContainer extends Component<
       const { updateDashboardData, updateWorkspaceData } = this.props;
       const fileText = await file.text();
       const exportedLayout = JSON.parse(fileText);
-      const {
-        filterSets,
-        layoutConfig,
-        links,
-      } = UserLayoutUtils.normalizeLayout(exportedLayout);
+      const { filterSets, layoutConfig, links } =
+        UserLayoutUtils.normalizeLayout(exportedLayout);
 
       updateWorkspaceData({ layoutConfig });
       updateDashboardData(DEFAULT_DASHBOARD_ID, {
@@ -594,14 +573,11 @@ export class AppMainContainer extends Component<
    */
   async resetLayout(): Promise<void> {
     const { layoutStorage, session } = this.props;
-    const {
-      filterSets,
-      layoutConfig,
-      links,
-    } = await UserLayoutUtils.getDefaultLayout(
-      layoutStorage,
-      session !== undefined
-    );
+    const { filterSets, layoutConfig, links } =
+      await UserLayoutUtils.getDefaultLayout(
+        layoutStorage,
+        session !== undefined
+      );
 
     const { updateDashboardData, updateWorkspaceData } = this.props;
     updateWorkspaceData({ layoutConfig });
@@ -636,35 +612,7 @@ export class AppMainContainer extends Component<
     }
   }
 
-  /**
-   * Load a Table plugin specified by a table
-   * @param pluginName The name of the plugin to load
-   * @returns An element from the plugin
-   */
-  handleLoadTablePlugin(
-    pluginName: string
-  ): ForwardRefExoticComponent<React.RefAttributes<unknown>> {
-    const { plugins } = this.props;
-
-    // First check if we have any plugin modules loaded that match the TablePlugin.
-    const pluginModule = plugins.get(pluginName);
-    if (
-      pluginModule != null &&
-      (pluginModule as { TablePlugin: ReactElement }).TablePlugin != null
-    ) {
-      return (pluginModule as {
-        TablePlugin: ForwardRefExoticComponent<React.RefAttributes<unknown>>;
-      }).TablePlugin;
-    }
-
-    const errorMessage = `Unable to find table plugin ${pluginName}.`;
-    log.error(errorMessage);
-    return ((
-      <div className="error-message">{`${errorMessage}`}</div>
-    ) as unknown) as ForwardRefExoticComponent<React.RefAttributes<unknown>>;
-  }
-
-  startListeningForDisconnect() {
+  startListeningForDisconnect(): void {
     const { connection } = this.props;
     connection.addEventListener(
       dh.IdeConnection.EVENT_DISCONNECT,
@@ -680,7 +628,7 @@ export class AppMainContainer extends Component<
     );
   }
 
-  stopListeningForDisconnect() {
+  stopListeningForDisconnect(): void {
     const { connection } = this.props;
     connection.removeEventListener(
       dh.IdeConnection.EVENT_DISCONNECT,
@@ -697,11 +645,9 @@ export class AppMainContainer extends Component<
   }
 
   hydrateDefault(
-    props: {
-      metadata?: { type?: string; id?: string; name?: string };
-    } & PanelProps,
+    props: DehydratedDashboardPanelProps,
     id: string
-  ): DashboardPanelProps & { fetch?: () => Promise<unknown> } {
+  ): DehydratedDashboardPanelProps & { fetch?: () => Promise<unknown> } {
     const { connection } = this.props;
     const { metadata } = props;
     if (
@@ -715,60 +661,18 @@ export class AppMainContainer extends Component<
               type: metadata.type,
               id: metadata.id,
             }
-          : { type: metadata.type, name: metadata.name, title: metadata.name };
+          : {
+              type: metadata.type,
+              name: metadata.name,
+              title: metadata.name,
+            };
       return {
         fetch: () => connection.getObject(widget),
-        localDashboardId: id,
         ...props,
+        localDashboardId: id,
       };
     }
     return DashboardUtils.hydrate(props, id);
-  }
-
-  hydrateGrid(props: IrisGridPanelProps, id: string): IrisGridPanelProps {
-    return this.hydrateTable(
-      props,
-      id,
-      props.metadata.type ?? dh.VariableType.TABLE
-    );
-  }
-
-  hydratePandas(props: PandasPanelProps, id: string): PandasPanelProps {
-    return this.hydrateTable(props, id, dh.VariableType.PANDAS);
-  }
-
-  hydrateTable<T extends { metadata: GridPanelMetadata }>(
-    props: T,
-    id: string,
-    type: string = dh.VariableType.TABLE
-  ): T & {
-    getDownloadWorker: () => Promise<ServiceWorker>;
-    loadPlugin: (
-      pluginName: string
-    ) => React.ForwardRefExoticComponent<React.RefAttributes<unknown>>;
-    localDashboardId: string;
-    makeModel: () => Promise<IrisGridModel>;
-  } {
-    const { connection } = this.props;
-    return {
-      ...props,
-      getDownloadWorker: DownloadServiceWorkerUtils.getServiceWorker,
-      loadPlugin: this.handleLoadTablePlugin,
-      localDashboardId: id,
-      makeModel: () => createGridModel(dh, connection, props.metadata, type),
-    };
-  }
-
-  hydrateChart(props: ChartPanelProps, id: string): ChartPanelProps {
-    const { connection } = this.props;
-    return {
-      ...props,
-      localDashboardId: id,
-      makeModel: () => {
-        const { metadata, panelState } = props;
-        return createChartModel(dh, connection, metadata, panelState);
-      },
-    };
   }
 
   /**
@@ -785,24 +689,26 @@ export class AppMainContainer extends Component<
     });
   }
 
-  getDashboardPlugins = memoize((plugins: DeephavenPluginModuleMap) =>
-    ([...plugins.entries()].filter(
-      ([, plugin]: [string, { DashboardPlugin?: typeof React.Component }]) =>
-        plugin.DashboardPlugin != null
-    ) as [
-      string,
-      { DashboardPlugin: typeof React.Component }
-    ][]).map(([name, { DashboardPlugin }]) => <DashboardPlugin key={name} />)
-  );
+  getDashboardPlugins = memoize((plugins: DeephavenPluginModuleMap) => {
+    const dashboardPlugins = [...plugins.entries()].filter(
+      ([, plugin]) =>
+        isDashboardPlugin(plugin) || isLegacyDashboardPlugin(plugin)
+    ) as [string, DashboardPlugin | LegacyDashboardPlugin][];
+
+    return dashboardPlugins.map(([name, plugin]) => {
+      if (isLegacyDashboardPlugin(plugin)) {
+        const { DashboardPlugin: DPlugin } = plugin;
+        return <DPlugin key={name} />;
+      }
+
+      const { component: DPlugin } = plugin;
+      return <DPlugin key={name} />;
+    });
+  });
 
   render(): ReactElement {
-    const {
-      activeTool,
-      plugins,
-      user,
-      workspace,
-      serverConfigValues,
-    } = this.props;
+    const { activeTool, plugins, user, workspace, serverConfigValues } =
+      this.props;
     const { data: workspaceData } = workspace;
     const { layoutConfig } = workspaceData;
     const { permissions } = user;
@@ -812,7 +718,9 @@ export class AppMainContainer extends Component<
       isAuthFailed,
       isDisconnected,
       isPanelsMenuShown,
+      isResetLayoutPromptShown,
       isSettingsMenuShown,
+      unsavedNotebookCount,
       widgets,
     } = this.state;
     const dashboardPlugins = this.getDashboardPlugins(plugins);
@@ -867,6 +775,9 @@ export class AppMainContainer extends Component<
                     isShown={isPanelsMenuShown}
                     className="panels-menu-popper"
                     onExited={this.handleWidgetsMenuClose}
+                    options={{
+                      placement: 'bottom',
+                    }}
                     closeOnBlur
                     interactive
                   >
@@ -888,12 +799,32 @@ export class AppMainContainer extends Component<
                 })}
                 onClick={this.handleSettingsMenuShow}
                 icon={
-                  <FontAwesomeIcon
-                    icon={vsGear}
-                    transform="grow-3 right-1 down-1"
-                  />
+                  <span className="fa-layers">
+                    <FontAwesomeIcon
+                      icon={vsGear}
+                      transform="grow-3 right-1 down-1"
+                    />
+                    {isDisconnected && !isAuthFailed && (
+                      <>
+                        <FontAwesomeIcon
+                          icon={dhSquareFilled}
+                          color={ThemeExport.background}
+                          transform="grow-2 right-8 down-8.5 rotate-45"
+                        />
+                        <FontAwesomeIcon
+                          icon={vsDebugDisconnect}
+                          color={ThemeExport.danger}
+                          transform="shrink-5 right-6 down-6"
+                        />
+                      </>
+                    )}
+                  </span>
                 }
-                tooltip="User Settings"
+                tooltip={
+                  isDisconnected && !isAuthFailed
+                    ? 'Server disconnected'
+                    : 'User Settings'
+                }
               />
             </div>
           </div>
@@ -909,13 +840,6 @@ export class AppMainContainer extends Component<
           onLayoutInitialized={this.openNotebookFromURL}
           hydrate={this.hydrateDefault}
         >
-          <GridPlugin
-            hydrate={this.hydrateGrid}
-            getDownloadWorker={DownloadServiceWorkerUtils.getServiceWorker}
-            loadPlugin={this.handleLoadTablePlugin}
-          />
-          <ChartPlugin hydrate={this.hydrateChart} />
-          <ChartBuilderPlugin />
           <ConsolePlugin
             hydrateConsole={AppMainContainer.hydrateConsole}
             notebooksUrl={
@@ -925,10 +849,6 @@ export class AppMainContainer extends Component<
               ).href
             }
           />
-          <FilterPlugin />
-          <PandasPlugin hydrate={this.hydratePandas} />
-          <MarkdownPlugin />
-          <LinkerPlugin />
           {dashboardPlugins}
         </Dashboard>
         <CSSTransition
@@ -954,7 +874,7 @@ export class AppMainContainer extends Component<
         />
         <DebouncedModal
           isOpen={isDisconnected && !isAuthFailed}
-          debounceMs={250}
+          debounceMs={1000}
         >
           <InfoModal
             icon={vsDebugDisconnect}
@@ -967,6 +887,23 @@ export class AppMainContainer extends Component<
           />
         </DebouncedModal>
         <BasicModal
+          confirmButtonText="Reset"
+          onConfirm={this.handleConfirmResetLayoutPrompt}
+          onCancel={this.handleCancelResetLayoutPrompt}
+          isConfirmDanger
+          isOpen={isResetLayoutPromptShown}
+          headerText={
+            unsavedNotebookCount === 0
+              ? 'Reset Layout'
+              : 'Reset layout and discard unsaved changes'
+          }
+          bodyText={
+            unsavedNotebookCount === 0
+              ? 'Do you want to reset your layout? Your existing layout will be lost.'
+              : 'Do you want to reset your layout? Any unsaved notebooks will be lost.'
+          }
+        />
+        <BasicModal
           confirmButtonText="Refresh"
           onConfirm={AppMainContainer.handleRefresh}
           isOpen={isAuthFailed}
@@ -978,7 +915,12 @@ export class AppMainContainer extends Component<
   }
 }
 
-const mapStateToProps = (state: RootState) => ({
+const mapStateToProps = (
+  state: RootState
+): Omit<
+  AppMainContainerProps,
+  'match' | 'setActiveTool' | 'updateDashboardData' | 'updateWorkspaceData'
+> => ({
   activeTool: getActiveTool(state),
   dashboardData: getDashboardData(
     state,

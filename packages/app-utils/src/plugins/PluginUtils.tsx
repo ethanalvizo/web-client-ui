@@ -1,59 +1,41 @@
-import React, { ForwardRefExoticComponent } from 'react';
-import {
-  AuthPlugin,
-  AuthPluginComponent,
-  isAuthPlugin,
-} from '@deephaven/auth-plugins';
+import { getThemeKey, ThemeData } from '@deephaven/components';
 import Log from '@deephaven/log';
-import RemoteComponent from './RemoteComponent';
+import {
+  type PluginModule,
+  type AuthPlugin,
+  type AuthPluginComponent,
+  isAuthPlugin,
+  LegacyAuthPlugin,
+  LegacyPlugin,
+  Plugin,
+  PluginType,
+  isLegacyAuthPlugin,
+  isLegacyPlugin,
+  isThemePlugin,
+  ThemePlugin,
+} from '@deephaven/plugin';
 import loadRemoteModule from './loadRemoteModule';
 
 const log = Log.module('@deephaven/app-utils.PluginUtils');
 
-// A PluginModule. This interface should have new fields added to it from different levels of plugins.
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface PluginModule {}
-
 export type PluginModuleMap = Map<string, PluginModule>;
 
-/**
- * Load a component plugin from the server.
- * @param baseURL Base URL of the plugin server
- * @param pluginName Name of the component plugin to load
- * @returns A lazily loaded JSX.Element from the plugin
- */
-export function loadComponentPlugin(
-  baseURL: URL,
-  pluginName: string
-): ForwardRefExoticComponent<React.RefAttributes<unknown>> {
-  const pluginUrl = new URL(`${pluginName}.js`, baseURL);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const Plugin: any = React.forwardRef((props, ref) => (
-    <RemoteComponent
-      url={pluginUrl.href}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      render={({ err, Component }: { err: unknown; Component: any }) => {
-        if (err != null && err !== '') {
-          const errorMessage = `Error loading plugin ${pluginName} from ${pluginUrl} due to ${err}`;
-          log.error(errorMessage);
-          return <div className="error-message">{`${errorMessage}`}</div>;
-        }
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        return <Component ref={ref} {...props} />;
-      }}
-    />
-  ));
-  Plugin.pluginName = pluginName;
-  Plugin.displayName = 'Plugin';
-  return Plugin;
-}
+export type PluginManifestPluginInfo = {
+  name: string;
+  main: string;
+  version: string;
+};
+
+export type PluginManifest = { plugins: PluginManifestPluginInfo[] };
 
 /**
  * Imports a commonjs plugin module from the provided URL
  * @param pluginUrl The URL of the plugin to load
  * @returns The loaded module
  */
-export async function loadModulePlugin(pluginUrl: string): Promise<unknown> {
+export async function loadModulePlugin(
+  pluginUrl: string
+): Promise<LegacyPlugin | { default: Plugin }> {
   const myModule = await loadRemoteModule(pluginUrl);
   return myModule;
 }
@@ -63,9 +45,7 @@ export async function loadModulePlugin(pluginUrl: string): Promise<unknown> {
  * @param jsonUrl The URL of the JSON file to load
  * @returns The JSON object of the manifest file
  */
-export async function loadJson(
-  jsonUrl: string
-): Promise<{ plugins: { name: string; main: string }[] }> {
+export async function loadJson(jsonUrl: string): Promise<PluginManifest> {
   const res = await fetch(jsonUrl);
   if (!res.ok) {
     throw new Error(res.statusText);
@@ -78,7 +58,7 @@ export async function loadJson(
 }
 
 /**
- * Load all plugin modules available.
+ * Load all plugin modules available based on the manifest file at the provided base URL
  * @param modulePluginsUrl The base URL of the module plugins to load
  * @returns A map from the name of the plugin to the plugin module that was loaded
  */
@@ -94,12 +74,13 @@ export async function loadModulePlugins(
     }
 
     log.debug('Plugin manifest loaded:', manifest);
-    const pluginPromises: Promise<unknown>[] = [];
+    const pluginPromises: Promise<LegacyPlugin | { default: Plugin }>[] = [];
     for (let i = 0; i < manifest.plugins.length; i += 1) {
       const { name, main } = manifest.plugins[i];
       const pluginMainUrl = `${modulePluginsUrl}/${name}/${main}`;
       pluginPromises.push(loadModulePlugin(pluginMainUrl));
     }
+
     const pluginModules = await Promise.allSettled(pluginPromises);
 
     const pluginMap: PluginModuleMap = new Map();
@@ -107,9 +88,21 @@ export async function loadModulePlugins(
       const module = pluginModules[i];
       const { name } = manifest.plugins[i];
       if (module.status === 'fulfilled') {
-        pluginMap.set(name, module.value as PluginModule);
+        const moduleValue = isLegacyPlugin(module.value)
+          ? module.value
+          : // TypeScript builds CJS default exports differently depending on
+            // whether there are also named exports. If the default is the only
+            // export, it will be the value. If there are also named exports,
+            // it will be assigned to the `default` property on the value.
+            module.value.default ?? module.value;
+
+        if (moduleValue == null) {
+          log.error(`Plugin '${name}' is missing an exported value.`);
+        } else {
+          pluginMap.set(name, moduleValue);
+        }
       } else {
-        log.error(`Unable to load plugin ${name}`, module.reason);
+        log.error(`Unable to load plugin '${name}'`, module.reason);
       }
     }
     log.info('Plugins loaded:', pluginMap);
@@ -139,27 +132,30 @@ export function getAuthHandlers(
 export function getAuthPluginComponent(
   pluginMap: PluginModuleMap,
   authConfigValues: Map<string, string>,
-  corePlugins?: Map<string, AuthPlugin>
+  corePlugins = new Map<string, AuthPlugin | LegacyAuthPlugin>()
 ): AuthPluginComponent {
   const authHandlers = getAuthHandlers(authConfigValues);
-  // Filter out all the plugins that are auth plugins, and then map them to [pluginName, AuthPlugin] pairs
-  // Uses some pretty disgusting casting, because TypeScript wants to treat it as an (string | AuthPlugin)[] array instead
-  const authPlugins = ([
-    ...pluginMap.entries(),
-  ].filter(([, plugin]: [string, { AuthPlugin?: AuthPlugin }]) =>
-    isAuthPlugin(plugin.AuthPlugin)
-  ) as [string, { AuthPlugin: AuthPlugin }][]).map(([name, plugin]) => [
-    name,
-    plugin.AuthPlugin,
-  ]) as [string, AuthPlugin][];
+  // User plugins take priority over core plugins
+  const authPlugins = (
+    [...pluginMap.entries(), ...corePlugins.entries()].filter(
+      ([, plugin]) => isAuthPlugin(plugin) || isLegacyAuthPlugin(plugin)
+    ) as [string, AuthPlugin | LegacyAuthPlugin][]
+  ).map(([name, plugin]) => {
+    if (isLegacyAuthPlugin(plugin)) {
+      return {
+        type: PluginType.AUTH_PLUGIN,
+        name,
+        component: plugin.AuthPlugin.Component,
+        isAvailable: plugin.AuthPlugin.isAvailable,
+      };
+    }
 
-  // Add all the core plugins in priority
-  authPlugins.push(...(corePlugins ?? []));
+    return plugin;
+  });
 
   // Filter the available auth plugins
-
-  const availableAuthPlugins = authPlugins.filter(([name, authPlugin]) =>
-    authPlugin.isAvailable(authHandlers, authConfigValues)
+  const availableAuthPlugins = authPlugins.filter(({ isAvailable }) =>
+    isAvailable(authHandlers, authConfigValues)
   );
 
   if (availableAuthPlugins.length === 0) {
@@ -169,12 +165,46 @@ export function getAuthPluginComponent(
   } else if (availableAuthPlugins.length > 1) {
     log.warn(
       'More than one login plugin available, will use the first one: ',
-      availableAuthPlugins.map(([name]) => name).join(', ')
+      availableAuthPlugins.map(({ name }) => name).join(', ')
     );
   }
 
-  const [loginPluginName, NewLoginPlugin] = availableAuthPlugins[0];
-  log.info('Using LoginPlugin', loginPluginName);
+  const { name, component } = availableAuthPlugins[0];
+  log.info('Using LoginPlugin', name);
 
-  return NewLoginPlugin.Component;
+  return component;
+}
+
+/**
+ * Extract theme data from theme plugins in the given plugin map.
+ * @param pluginMap
+ */
+export function getThemeDataFromPlugins(
+  pluginMap: PluginModuleMap
+): ThemeData[] {
+  const themePluginEntries = [...pluginMap.entries()].filter(
+    (entry): entry is [string, ThemePlugin] => isThemePlugin(entry[1])
+  );
+
+  log.debug('Getting theme data from plugins', themePluginEntries);
+
+  return themePluginEntries
+    .map(([pluginName, plugin]) => {
+      // Normalize to an array since config can be an array of configs or a
+      // single config
+      const configs = Array.isArray(plugin.themes)
+        ? plugin.themes
+        : [plugin.themes];
+
+      return configs.map(
+        ({ name, baseTheme, styleContent }) =>
+          ({
+            baseThemeKey: `default-${baseTheme ?? 'dark'}`,
+            themeKey: getThemeKey(pluginName, name),
+            name,
+            styleContent,
+          }) as const
+      );
+    })
+    .flat();
 }

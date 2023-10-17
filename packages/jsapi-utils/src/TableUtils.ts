@@ -18,13 +18,17 @@ import type {
   TreeTable,
 } from '@deephaven/jsapi-types';
 import {
+  bindAllMethods,
   CancelablePromise,
   PromiseUtils,
+  removeNullAndUndefined,
   TextUtils,
   TimeoutError,
 } from '@deephaven/utils';
 import DateUtils from './DateUtils';
 import { ColumnName } from './Formatter';
+import { createValueFilter, FilterConditionFactory } from './FilterUtils';
+import { getSize } from './ViewportDataUtils';
 
 const log = Log.module('TableUtils');
 
@@ -89,6 +93,29 @@ export class TableUtils {
 
   // Regex looking for a negative or positive integer or decimal number
   static NUMBER_REGEX = /^-?\d+(\.\d+)?$/;
+
+  /**
+   * Copy a given table and apply filters.
+   * @param maybeTable Table to copy and apply filters to
+   * @param filterFactories Filter condition factories to apply
+   * @returns A derived, filtered table
+   */
+  static async copyTableAndApplyFilters<
+    T extends Table | null | undefined,
+    R extends T extends Table ? T : null,
+  >(maybeTable: T, ...filterFactories: FilterConditionFactory[]): Promise<R> {
+    if (maybeTable == null) {
+      return null as R;
+    }
+
+    const derivedTable = await maybeTable.copy();
+
+    derivedTable.applyFilter(
+      removeNullAndUndefined(...filterFactories.map(f => f(derivedTable)))
+    );
+
+    return derivedTable as R;
+  }
 
   /**
    * Executes a callback on a given table and returns a Promise that will resolve
@@ -744,6 +771,97 @@ export class TableUtils {
 
   constructor(dh: DhType) {
     this.dh = dh;
+    bindAllMethods(this);
+  }
+
+  /**
+   * Create a table containing a distinct list of values for given column name and
+   * applies the given sort direction.
+   * @param table Source table to derive table from
+   * @param columnName Column to dermine distinct values
+   * @param sortDirection Direction to sort
+   * @param filterConditionFactories Optional filters to apply. Note that these
+   * will be applied before the `selectCall` in case we need to base the filtering
+   * on columns other than the distinct value column
+   */
+  async createDistinctSortedColumnTable(
+    table: Table | null | undefined,
+    columnName: string,
+    sortDirection: 'asc' | 'desc',
+    ...filterConditionFactories: FilterConditionFactory[]
+  ): Promise<Table | null> {
+    if (table == null) {
+      return null;
+    }
+
+    let sourceTable = table;
+
+    // Applying filters before `selectDistinct` so that we still have access to
+    // all columns. Also prevents a filter applied to the final table from
+    // clearing this filter.
+    if (filterConditionFactories.length > 0) {
+      sourceTable = await table.copy();
+
+      await sourceTable.applyFilter(
+        removeNullAndUndefined(
+          ...filterConditionFactories.map(f => f(sourceTable))
+        )
+      );
+    }
+
+    const column = sourceTable.findColumn(columnName);
+    const distinctTable = await sourceTable.selectDistinct([column]);
+
+    // If we copied the table, dispose the copy. Original is managed outside
+    // of this function
+    if (sourceTable !== table) {
+      sourceTable.close();
+    }
+
+    const distinctAscColSort = distinctTable
+      .findColumn(columnName)
+      .sort()
+      [sortDirection]();
+
+    return this.applySort(distinctTable, [distinctAscColSort]);
+  }
+
+  /**
+   * Check if any columns contain a given value.
+   * @param table Table to search for values
+   * @param columnNames Column names to search
+   * @param value Value to search for
+   * @param isCaseSensitive Whether the value check is case sensitive
+   */
+  async doesColumnValueExist(
+    table: Table | null | undefined,
+    columnNames: string | string[],
+    value: string,
+    isCaseSensitive: boolean
+  ): Promise<boolean | null> {
+    if (table == null) {
+      return null;
+    }
+
+    const filterConditionFactory = createValueFilter(
+      this,
+      columnNames,
+      value,
+      isCaseSensitive ? 'eq' : 'eqIgnoreCase'
+    );
+
+    const tableCopy = await table.copy();
+
+    await this.applyFilter(
+      tableCopy,
+      removeNullAndUndefined(filterConditionFactory(tableCopy))
+    );
+
+    const size = getSize(tableCopy);
+
+    tableCopy.close();
+
+    return size > 0;
   }
 
   /**
@@ -827,7 +945,8 @@ export class TableUtils {
     const { dh } = this;
     let filter = null;
 
-    const regex = /\s*(>=|<=|=>|=<|>|<|!=|=|!)?(\s*-\s*)?(\s*\d*(?:,\d{3})*(?:\.\d*)?\s*)?(null|nan|infinity|inf|\u221E)?(.*)/i;
+    const regex =
+      /\s*(>=|<=|=>|=<|>|<|!=|=|!)?(\s*-\s*)?(\s*\d*(?:,\d{3})*(?:\.\d*)?\s*)?(null|nan|infinity|inf|\u221E)?(.*)/i;
     const result = regex.exec(text);
 
     let operation = null;
@@ -912,6 +1031,79 @@ export class TableUtils {
     return TableUtils.makeRangeFilterWithOperation(filter, operation, value);
   }
 
+  /**
+   * Given a text string from a table, escape quick filter operators in string with \
+   * ex. =test returns \=test, null returns \null
+   * @param string quickfilter string to escape
+   * @returns escaped string
+   */
+  static escapeQuickTextFilter(quickFilterText: string | null): string | null {
+    if (quickFilterText == null) return null;
+    const regex = /^(!~|!=|~|=|!)?(.*)/;
+    // starts with zero or more \ followed by and ending with null
+    const nullRegex = /^\\*null$/;
+    const result = regex.exec(quickFilterText);
+    let operation: string | null = null;
+    let value: string | null = null;
+    if (result !== null && result.length > 2) {
+      [, operation, value] = result;
+    }
+
+    if (operation != null) {
+      return `\\${operation}${value ?? ''}`;
+    }
+
+    if (value != null && nullRegex.test(value.toLowerCase())) {
+      // adds an extra escape character to matching value
+      return `\\${value}`;
+    }
+    if (value != null && value.startsWith('*')) {
+      return `\\${value}`;
+    }
+    if (value != null && value.endsWith('*') && !value.endsWith('\\*')) {
+      value = value.substring(0, value.length - 1);
+      return `${value}\\*`;
+    }
+
+    return `${operation ?? ''}${value ?? ``}`;
+  }
+
+  /**
+   * Given an escaped quick filter, unescape the operators for giving it to the js api
+   * ex. \=test returns =test, \null returns null
+   * @param string quickfilter string to escape
+   * @returns escaped string
+   */
+  static unescapeQuickTextFilter(quickFilterText: string): string {
+    const regex = /^(\\!~|\\!=|\\~|\\=|\\!)?(.*)/;
+    // starts with zero or more \ followed by and ending with null
+    const nullRegex = /^\\*null$/;
+    const result = regex.exec(quickFilterText);
+    let operation: string | null = null;
+    let value: string | null = null;
+    if (result !== null && result.length > 2) {
+      [, operation, value] = result;
+    }
+
+    if (operation != null) {
+      operation = operation.replace('\\', '');
+    }
+
+    if (value != null && nullRegex.test(value.toLowerCase())) {
+      // removes the first occurance of the backslash
+      value = value.replace('\\', '');
+    }
+    if (operation == null && value != null && value.startsWith('\\*')) {
+      value = value.substring(1);
+    }
+    if (operation == null && value != null && value.endsWith('\\*')) {
+      value = value.substring(0, value.length - 2);
+      return `${value}*`;
+    }
+
+    return `${operation ?? ''}${value ?? ``}`;
+  }
+
   makeQuickTextFilter(column: Column, text: string): FilterCondition | null {
     const { dh } = this;
     const cleanText = `${text}`.trim();
@@ -927,10 +1119,16 @@ export class TableUtils {
       }
     }
 
-    if (value == null || value.length === 0) {
+    if (value == null) {
       return null;
     }
 
+    // allow empty strings, but only for explicit equal and not equal
+    if (value.length === 0 && !(operation === '=' || operation === '!=')) {
+      return null;
+    }
+
+    // no operation is treated as an implicit equals
     if (operation == null) {
       operation = '=';
     }
@@ -959,7 +1157,8 @@ export class TableUtils {
       value = value.substring(0, value.length - 1);
     }
 
-    value = value.replace('\\', '');
+    // unescape any escaped operators to allow search for literal operators
+    value = TableUtils.unescapeQuickTextFilter(value);
 
     switch (operation) {
       case '~': {
@@ -1014,7 +1213,6 @@ export class TableUtils {
         return filter.notEqIgnoreCase(
           dh.FilterValue.ofString(value.toLowerCase())
         );
-
       case '=':
         if (prefix === '*') {
           // Ends with
@@ -1265,12 +1463,8 @@ export class TableUtils {
     options: AdvancedFilterOptions,
     timeZone: string
   ): FilterCondition | null {
-    const {
-      filterItems,
-      filterOperators,
-      invertSelection,
-      selectedValues,
-    } = options;
+    const { filterItems, filterOperators, invertSelection, selectedValues } =
+      options;
     let filter = null;
     for (let i = 0; i < filterItems.length; i += 1) {
       const filterItem = filterItems[i];

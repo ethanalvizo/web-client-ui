@@ -3,6 +3,87 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.49.0](https://github.com/deephaven/web-client-ui/compare/v0.48.0...v0.49.0) (2023-09-15)
+
+**Note:** Version bump only for package @deephaven/jsapi-utils
+
+
+
+
+
+# [0.48.0](https://github.com/deephaven/web-client-ui/compare/v0.47.0...v0.48.0) (2023-09-12)
+
+**Note:** Version bump only for package @deephaven/jsapi-utils
+
+
+
+
+
+# [0.47.0](https://github.com/deephaven/web-client-ui/compare/v0.46.1...v0.47.0) (2023-09-08)
+
+
+### Bug Fixes
+
+* Forbid [@deephaven](https://github.com/deephaven) modules from self importing ([#1499](https://github.com/deephaven/web-client-ui/issues/1499)) ([81cdd65](https://github.com/deephaven/web-client-ui/commit/81cdd6512456bcc08fde776670659a6028841875)), closes [#1497](https://github.com/deephaven/web-client-ui/issues/1497)
+
+
+
+
+
+## [0.46.1](https://github.com/deephaven/web-client-ui/compare/v0.46.0...v0.46.1) (2023-09-01)
+
+**Note:** Version bump only for package @deephaven/jsapi-utils
+
+
+
+
+
+# [0.46.0](https://github.com/deephaven/web-client-ui/compare/v0.45.1...v0.46.0) (2023-08-18)
+
+**Note:** Version bump only for package @deephaven/jsapi-utils
+
+
+
+
+
+# [0.45.0](https://github.com/deephaven/web-client-ui/compare/v0.44.1...v0.45.0) (2023-07-31)
+
+**Note:** Version bump only for package @deephaven/jsapi-utils
+
+# [0.44.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.44.0) (2023-07-07)
+
+**Note:** Version bump only for package @deephaven/jsapi-utils
+
+# [0.43.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.43.0) (2023-07-07)
+
+**Note:** Version bump only for package @deephaven/jsapi-utils
+
+# [0.42.0](https://github.com/deephaven/web-client-ui/compare/v0.41.1...v0.42.0) (2023-06-29)
+
+### Bug Fixes
+
+- AuthPluginParent wasn't working when embedded in an iframe ([#1383](https://github.com/deephaven/web-client-ui/issues/1383)) ([e23695d](https://github.com/deephaven/web-client-ui/commit/e23695d4baf232720ca89cb7d24e9a918f3fe913)), closes [#1373](https://github.com/deephaven/web-client-ui/issues/1373)
+
+### Features
+
+- improvements to null and empty strings filters in grid ([#1348](https://github.com/deephaven/web-client-ui/issues/1348)) ([ed3a8c5](https://github.com/deephaven/web-client-ui/commit/ed3a8c5f224094306ff55f9b41706cb58ff709e2)), closes [#1243](https://github.com/deephaven/web-client-ui/issues/1243)
+
+# [0.41.0](https://github.com/deephaven/web-client-ui/compare/v0.40.4...v0.41.0) (2023-06-08)
+
+**Note:** Version bump only for package @deephaven/jsapi-utils
+
+## [0.40.4](https://github.com/deephaven/web-client-ui/compare/v0.40.3...v0.40.4) (2023-06-02)
+
+### Bug Fixes
+
+- DateWrapper fails on first day of month ([#1342](https://github.com/deephaven/web-client-ui/issues/1342)) ([a4677eb](https://github.com/deephaven/web-client-ui/commit/a4677eb0215b9f3746d68068b0ae13b36736a228)), closes [#1341](https://github.com/deephaven/web-client-ui/issues/1341)
+
+## [0.40.3](https://github.com/deephaven/web-client-ui/compare/v0.40.2...v0.40.3) (2023-05-31)
+
+### Bug Fixes
+
+- today/yesterday keywords failed on last/first day of month ([#1336](https://github.com/deephaven/web-client-ui/issues/1336)) ([4c3fe24](https://github.com/deephaven/web-client-ui/commit/4c3fe24c083a827b0d8ec57219a0083c84bb894c)), closes [#1335](https://github.com/deephaven/web-client-ui/issues/1335)
+
 ## [0.40.1](https://github.com/deephaven/web-client-ui/compare/v0.40.0...v0.40.1) (2023-05-24)
 
 **Note:** Version bump only for package @deephaven/jsapi-utils

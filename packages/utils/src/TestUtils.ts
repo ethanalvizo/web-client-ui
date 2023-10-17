@@ -31,7 +31,25 @@ export interface ClickOptions {
   rightClick?: boolean;
 }
 
+/**
+ * Filters a type down to only method properties.
+ */
+export type PickMethods<T> = {
+  [K in keyof T as T[K] extends (...args: unknown[]) => unknown
+    ? K
+    : never]: T[K];
+};
+
+export type ConsoleMethodName = keyof PickMethods<Console>;
+
 class TestUtils {
+  /**
+   * jest.useFakeTimers mocks `process.nextTick` by default. Hold on to a
+   * reference to the real function so we can still use it.
+   */
+  static realNextTick =
+    typeof process !== 'undefined' ? process.nextTick : undefined;
+
   /**
    * Type assertion to "cast" a function to it's corresponding jest.Mock
    * function type. Note that this is a types only helper for type assertions.
@@ -50,7 +68,28 @@ class TestUtils {
    */
   static asMock = <TResult, TArgs extends unknown[]>(
     fn: (...args: TArgs) => TResult
-  ): jest.Mock<TResult, TArgs> => (fn as unknown) as jest.Mock<TResult, TArgs>;
+  ): jest.Mock<TResult, TArgs> => fn as unknown as jest.Mock<TResult, TArgs>;
+
+  /**
+   * Selectively disable logging methods on `console` object. Uses spyOn so that
+   * changes will be reverted after leaving the test scope that it is set in. If
+   * no method names are given, all will be disabled.
+   * @param methodNames The console methods to disable.
+   */
+  static disableConsoleOutput = (...methodNames: ConsoleMethodName[]): void => {
+    if (methodNames.length === 0) {
+      // eslint-disable-next-line no-param-reassign
+      methodNames = Object.getOwnPropertyNames(console).filter(
+        (name): name is ConsoleMethodName =>
+          // eslint-disable-next-line no-console
+          typeof console[name as keyof Console] === 'function'
+      );
+    }
+
+    methodNames.forEach(methodName => {
+      jest.spyOn(console, methodName).mockImplementation();
+    });
+  };
 
   /**
    * Find the last mock function call matching a given predicate.
@@ -60,7 +99,8 @@ class TestUtils {
   static findLastCall = <TResult, TArgs extends unknown[]>(
     fn: (...args: TArgs) => TResult,
     predicate: (args: TArgs) => boolean
-  ) => TestUtils.asMock(fn).mock.calls.reverse().find(predicate);
+  ): TArgs | undefined =>
+    TestUtils.asMock(fn).mock.calls.reverse().find(predicate);
 
   static makeMockContext(): MockContext {
     return {
@@ -94,15 +134,10 @@ class TestUtils {
     operateAs: 'test',
     groups: ['allusers', 'test'],
     permissions: {
-      isSuperUser: false,
-      isQueryViewOnly: false,
-      isNonInteractive: false,
       canUsePanels: true,
-      canCreateDashboard: true,
-      canCreateCodeStudio: true,
-      canCreateQueryMonitor: true,
       canCopy: true,
       canDownloadCsv: true,
+      canLogout: true,
     },
   };
 
@@ -131,10 +166,27 @@ class TestUtils {
     }
   }
 
+  /**
+   * Jest doesn't have a built in way to ensure native Promises have resolved
+   * when using fake timers. We can mimic this behavior by using `process.nextTick`.
+   * Since `process.nextTick` is mocked by default when using jest.useFakeTimers(),
+   * we use the "real" process.nextTick stored in `TestUtils.realNextTick`.
+   *
+   * NOTE: Jest can be configured to leave `process.nextTick` unmocked, but this
+   * requires devs to configure it on every test.
+   * e.g.
+   * jest.useFakeTimers({
+   *   doNotFake: ['nextTick'],
+   * });
+   */
+  static async flushPromises(): Promise<void> {
+    await new Promise(TestUtils.realNextTick ?? (() => undefined));
+  }
+
   static async rightClick(
     user: ReturnType<typeof userEvent.setup>,
     element: Element
-  ) {
+  ): Promise<void> {
     await user.pointer([
       { target: element },
       { keys: '[MouseRight]', target: element },

@@ -28,7 +28,7 @@ const INPUT_TYPE = Object.freeze({
   FORMULA: 'formula',
 });
 
-const EMPTY_FN = () => {
+const EMPTY_FN = (): void => {
   // no-op
 };
 
@@ -111,6 +111,7 @@ function CustomColumnInput({
             <InputEditor
               editorSettings={{ language: 'deephavenDb' }}
               editorIndex={inputIndex}
+              placeholder="Column Formula"
               value={formula}
               onContentChanged={handleFormulaEditorContentChanged}
               onTab={onTabInEditor}

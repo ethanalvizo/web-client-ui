@@ -3,6 +3,179 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.49.1](https://github.com/deephaven/web-client-ui/compare/v0.49.0...v0.49.1) (2023-09-27)
+
+
+### Bug Fixes
+
+* Copy did not work from embedded iframes ([#1528](https://github.com/deephaven/web-client-ui/issues/1528)) ([3549a33](https://github.com/deephaven/web-client-ui/commit/3549a33c6152660ed44601eb2e03312d694e6167)), closes [#1527](https://github.com/deephaven/web-client-ui/issues/1527)
+* Render tables partitioned by non-string columns ([#1533](https://github.com/deephaven/web-client-ui/issues/1533)) ([585b2ff](https://github.com/deephaven/web-client-ui/commit/585b2ffc533dd95ff56247627c7ea1e0928f337b)), closes [#1441](https://github.com/deephaven/web-client-ui/issues/1441)
+
+
+
+
+
+# [0.49.0](https://github.com/deephaven/web-client-ui/compare/v0.48.0...v0.49.0) (2023-09-15)
+
+
+### Code Refactoring
+
+* Improve table saver to always use the correct service worker ([#1515](https://github.com/deephaven/web-client-ui/issues/1515)) ([2488e52](https://github.com/deephaven/web-client-ui/commit/2488e52fdeda16604be2516c30782d6127be9317)), closes [#766](https://github.com/deephaven/web-client-ui/issues/766)
+
+
+### Features
+
+* Update go to row panel's row number with cursorRow ([#1508](https://github.com/deephaven/web-client-ui/issues/1508)) ([23ab5cc](https://github.com/deephaven/web-client-ui/commit/23ab5cc0f798304a274ed2de2473cc9c74ca84cb)), closes [#1406](https://github.com/deephaven/web-client-ui/issues/1406)
+
+
+### BREAKING CHANGES
+
+* `TableSaver` now expects the service worker to send it
+a complete URL for download instead of just a file name. DHE will need
+to adjust its `serviceWorker.js` to incorporate the same changes from
+this PR.
+
+
+
+
+
+# [0.48.0](https://github.com/deephaven/web-client-ui/compare/v0.47.0...v0.48.0) (2023-09-12)
+
+
+### Bug Fixes
+
+* Hide "Append Command" button when viewing partition aware table in iframe UI ([#1495](https://github.com/deephaven/web-client-ui/issues/1495)) ([d15d6b1](https://github.com/deephaven/web-client-ui/commit/d15d6b1d174acd77c63c2dfc28a49ca08a4cd0ab)), closes [#1414](https://github.com/deephaven/web-client-ui/issues/1414)
+
+
+
+
+
+# [0.47.0](https://github.com/deephaven/web-client-ui/compare/v0.46.1...v0.47.0) (2023-09-08)
+
+
+### Bug Fixes
+
+* quick filter focus text doesn't match canvas text ([#1475](https://github.com/deephaven/web-client-ui/issues/1475)) ([02841b5](https://github.com/deephaven/web-client-ui/commit/02841b5a9dedc25160f319a072636335aa77599f)), closes [#1472](https://github.com/deephaven/web-client-ui/issues/1472)
+* Remove totals table rows from displayed row count ([#1492](https://github.com/deephaven/web-client-ui/issues/1492)) ([f686891](https://github.com/deephaven/web-client-ui/commit/f68689121c7df098dbf86fa76bf2ccf8dbda6566)), closes [#1407](https://github.com/deephaven/web-client-ui/issues/1407)
+
+
+### Features
+
+* Consolidate and normalize plugin types ([#1456](https://github.com/deephaven/web-client-ui/issues/1456)) ([43a782d](https://github.com/deephaven/web-client-ui/commit/43a782dd3ebf582b18e155fdbc313176b0bf0f84)), closes [#1454](https://github.com/deephaven/web-client-ui/issues/1454) [#1451](https://github.com/deephaven/web-client-ui/issues/1451)
+
+
+
+
+
+## [0.46.1](https://github.com/deephaven/web-client-ui/compare/v0.46.0...v0.46.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* flaky e2e tests ([#1453](https://github.com/deephaven/web-client-ui/issues/1453)) ([d59e9be](https://github.com/deephaven/web-client-ui/commit/d59e9bed95152170626265a00ea27d716e1b2bcb))
+
+
+
+
+
+# [0.46.0](https://github.com/deephaven/web-client-ui/compare/v0.45.1...v0.46.0) (2023-08-18)
+
+
+### Bug Fixes
+
+* Upgrade Monaco to ^0.41.0 ([#1448](https://github.com/deephaven/web-client-ui/issues/1448)) ([1120c2b](https://github.com/deephaven/web-client-ui/commit/1120c2b235d2ca2c8b14c818ccfc2847294c3811)), closes [#1445](https://github.com/deephaven/web-client-ui/issues/1445) [#1191](https://github.com/deephaven/web-client-ui/issues/1191)
+
+
+### BREAKING CHANGES
+
+* Monaco will need to be upgraded to ^0.41.0 in
+Enterprise to ensure compatibility
+
+**Tests Performed**
+
+- Console Input
+    - `Cmd+F` does nothing
+    - Intellisense can be closed via `Esc`
+- Log tab
+    - `Esc` does not close find input
+    - `Esc` does clear selection when focus is in the log content
+- Code Editor
+- Verified that newline with leading space no longer crashes the browser
+tab
+      ```
+      a
+       a
+      ```
+- Wrote some Python code. Intellisense, syntax highlighting, and general
+typing experience seemed as expected
+   - Execute full code + selected code successfully
+
+
+
+
+
+## [0.45.1](https://github.com/deephaven/web-client-ui/compare/v0.45.0...v0.45.1) (2023-08-01)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
+
+
+
+
+# [0.45.0](https://github.com/deephaven/web-client-ui/compare/v0.44.1...v0.45.0) (2023-07-31)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
+## [0.44.1](https://github.com/deephaven/web-client-ui/compare/v0.44.0...v0.44.1) (2023-07-11)
+
+### Bug Fixes
+
+- tree and rollup default to non-sortable ([#1404](https://github.com/deephaven/web-client-ui/issues/1404)) ([5a8f34d](https://github.com/deephaven/web-client-ui/commit/5a8f34def53f03796fab265e2d1b1951480b5ecb)), closes [#1402](https://github.com/deephaven/web-client-ui/issues/1402)
+
+# [0.44.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.44.0) (2023-07-07)
+
+### Features
+
+- DH-14538: Export InputEditor and added options ([#1398](https://github.com/deephaven/web-client-ui/issues/1398)) ([405f42f](https://github.com/deephaven/web-client-ui/commit/405f42f9dfc880319c7d5afbf80d81b04965ec52)), closes [#1397](https://github.com/deephaven/web-client-ui/issues/1397)
+- disable column sorting on unsupported types ([#1390](https://github.com/deephaven/web-client-ui/issues/1390)) ([3a89bbf](https://github.com/deephaven/web-client-ui/commit/3a89bbf4d28494c03541d474deb408c2ece4606a)), closes [#1380](https://github.com/deephaven/web-client-ui/issues/1380)
+
+# [0.43.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.43.0) (2023-07-07)
+
+### Features
+
+- DH-14538: Export InputEditor and added options ([#1398](https://github.com/deephaven/web-client-ui/issues/1398)) ([405f42f](https://github.com/deephaven/web-client-ui/commit/405f42f9dfc880319c7d5afbf80d81b04965ec52)), closes [#1397](https://github.com/deephaven/web-client-ui/issues/1397)
+- disable column sorting on unsupported types ([#1390](https://github.com/deephaven/web-client-ui/issues/1390)) ([3a89bbf](https://github.com/deephaven/web-client-ui/commit/3a89bbf4d28494c03541d474deb408c2ece4606a)), closes [#1380](https://github.com/deephaven/web-client-ui/issues/1380)
+
+# [0.42.0](https://github.com/deephaven/web-client-ui/compare/v0.41.1...v0.42.0) (2023-06-29)
+
+### Bug Fixes
+
+- DH-15032: Fix incorrect warning about updated shared state ([#1364](https://github.com/deephaven/web-client-ui/issues/1364)) ([9e53dd2](https://github.com/deephaven/web-client-ui/commit/9e53dd2796b84963bd90e7043122a6b2c4d3cf46))
+
+### Features
+
+- improvements to null and empty strings filters in grid ([#1348](https://github.com/deephaven/web-client-ui/issues/1348)) ([ed3a8c5](https://github.com/deephaven/web-client-ui/commit/ed3a8c5f224094306ff55f9b41706cb58ff709e2)), closes [#1243](https://github.com/deephaven/web-client-ui/issues/1243)
+
+### Reverts
+
+- adding back "Table rendering support for databars ([#1212](https://github.com/deephaven/web-client-ui/issues/1212))" ([#1365](https://github.com/deephaven/web-client-ui/issues/1365)) ([8586d4d](https://github.com/deephaven/web-client-ui/commit/8586d4d99e55def1747eb820e824b61703990e58))
+
+# [0.41.0](https://github.com/deephaven/web-client-ui/compare/v0.40.4...v0.41.0) (2023-06-08)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
+## [0.40.4](https://github.com/deephaven/web-client-ui/compare/v0.40.3...v0.40.4) (2023-06-02)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
+## [0.40.3](https://github.com/deephaven/web-client-ui/compare/v0.40.2...v0.40.3) (2023-05-31)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
+## [0.40.2](https://github.com/deephaven/web-client-ui/compare/v0.40.1...v0.40.2) (2023-05-31)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
 ## [0.40.1](https://github.com/deephaven/web-client-ui/compare/v0.40.0...v0.40.1) (2023-05-24)
 
 **Note:** Version bump only for package @deephaven/iris-grid

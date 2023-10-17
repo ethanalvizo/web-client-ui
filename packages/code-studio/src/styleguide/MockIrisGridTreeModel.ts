@@ -10,6 +10,7 @@ import {
   GridRange,
   MockTreeGridModel,
   ModelIndex,
+  MoveOperation,
 } from '@deephaven/grid';
 import {
   IrisGridModel,
@@ -40,7 +41,8 @@ const EMPTY_ARRAY: never[] = [];
  */
 class MockIrisGridTreeModel
   extends IrisGridModel
-  implements ExpandableGridModel, EditableGridModel {
+  implements ExpandableGridModel, EditableGridModel
+{
   protected model: MockTreeGridModel;
 
   protected editedData: string[][];
@@ -343,23 +345,23 @@ class MockIrisGridTreeModel
     // no-op
   }
 
-  get columnHeaderGroupMap() {
+  get columnHeaderGroupMap(): Map<string, ColumnHeaderGroup> {
     return new Map();
   }
 
-  getColumnHeaderParentGroup() {
+  getColumnHeaderParentGroup(): ColumnHeaderGroup | undefined {
     return undefined;
   }
 
-  get initialMovedColumns() {
+  get initialMovedColumns(): readonly MoveOperation[] {
     return [];
   }
 
-  get initialMovedRows() {
+  get initialMovedRows(): readonly MoveOperation[] {
     return [];
   }
 
-  get initialColumnHeaderGroups() {
+  get initialColumnHeaderGroups(): readonly ColumnHeaderGroup[] {
     return [];
   }
 }

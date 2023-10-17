@@ -1,8 +1,6 @@
 {
-  "packages": ["packages/*"],
-  "useWorkspaces": true,
   "useNx": false,
-  "version": "0.40.1",
+  "version": "0.49.1",
   "command": {
     "publish": {
       "distTag": "latest"

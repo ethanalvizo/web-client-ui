@@ -217,7 +217,8 @@ export class DateUtils {
    * @returns Containing the date time components
    */
   static parseDateTimeString(dateTimeString: string): DateParts<string> {
-    const regex = /\s*(\d{4})([-./]([\da-z]+))?([-./](\d{1,2}))?([tT\s](\d{2})([:](\d{2}))?([:](\d{2}))?([.](\d{1,9}))?)?(.*)/;
+    const regex =
+      /\s*(\d{4})([-./]([\da-z]+))?([-./](\d{1,2}))?([tT\s](\d{2})([:](\d{2}))?([:](\d{2}))?([.](\d{1,9}))?)?(.*)/;
     const result = regex.exec(dateTimeString);
     if (result == null) {
       throw new Error(`Unexpected date string: ${dateTimeString}`);
@@ -278,24 +279,34 @@ export class DateUtils {
         now.getMonth(),
         now.getDate()
       );
-      const endDate = DateUtils.makeDateWrapper(
-        dh,
-        timeZone,
+      const tomorrow = new Date(
         now.getFullYear(),
         now.getMonth(),
         now.getDate() + 1
+      );
+      const endDate = DateUtils.makeDateWrapper(
+        dh,
+        timeZone,
+        tomorrow.getFullYear(),
+        tomorrow.getMonth(),
+        tomorrow.getDate()
       );
       return [startDate, endDate];
     }
 
     if (cleanText === 'yesterday') {
       const now = new Date(Date.now());
-      const startDate = DateUtils.makeDateWrapper(
-        dh,
-        timeZone,
+      const yesterday = new Date(
         now.getFullYear(),
         now.getMonth(),
         now.getDate() - 1
+      );
+      const startDate = DateUtils.makeDateWrapper(
+        dh,
+        timeZone,
+        yesterday.getFullYear(),
+        yesterday.getMonth(),
+        yesterday.getDate()
       );
       const endDate = DateUtils.makeDateWrapper(
         dh,

@@ -26,7 +26,7 @@ const FIXED_WIDTH_SPACE = '\u2007';
 export type SelectionSegment = {
   selectionStart: number;
   selectionEnd: number;
-  selectionDirection?: typeof SELECTION_DIRECTION[keyof typeof SELECTION_DIRECTION];
+  selectionDirection?: (typeof SELECTION_DIRECTION)[keyof typeof SELECTION_DIRECTION];
 };
 
 type MaskedInputProps = {
@@ -107,11 +107,8 @@ const MaskedInput = React.forwardRef<HTMLInputElement, MaskedInputProps>(
       function setSelectedSegment() {
         if (selection != null) {
           log.debug('setting selection...', selection);
-          const {
-            selectionStart,
-            selectionEnd,
-            selectionDirection,
-          } = selection;
+          const { selectionStart, selectionEnd, selectionDirection } =
+            selection;
           input.current?.setSelectionRange(
             selectionStart,
             selectionEnd,
@@ -346,7 +343,9 @@ const MaskedInput = React.forwardRef<HTMLInputElement, MaskedInputProps>(
       [input, selection, value]
     );
 
-    function handleArrowKey(event: React.KeyboardEvent<HTMLInputElement>) {
+    function handleArrowKey(
+      event: React.KeyboardEvent<HTMLInputElement>
+    ): void {
       event.preventDefault();
       event.stopPropagation();
 
@@ -375,7 +374,7 @@ const MaskedInput = React.forwardRef<HTMLInputElement, MaskedInputProps>(
       }
     }
 
-    function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>): void {
       if (!input.current) {
         return;
       }

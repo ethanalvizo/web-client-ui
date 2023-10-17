@@ -28,8 +28,12 @@ type CommandHistoryDoc = PouchDB.Core.ExistingDocument<
 
 export class PouchCommandHistoryTable
   extends PouchStorageTable<CommandHistoryStorageItem>
-  implements CommandHistoryTable {
-  constructor(language: string, private cache: PouchCommandHistoryCache) {
+  implements CommandHistoryTable
+{
+  constructor(
+    language: string,
+    private cache: PouchCommandHistoryCache
+  ) {
     super(`CommandHistoryStorage.${language}`, {
       // Optimizations to cut down on growing table size. These should be safe
       // since we don't care about revision history for command history
@@ -216,7 +220,7 @@ export class PouchCommandHistoryTable
    * Mark given items as `_deleted` in the database.
    * @param items
    */
-  async pruneItems(items: CommandHistoryDoc[]) {
+  async pruneItems(items: CommandHistoryDoc[]): Promise<void> {
     if (this.cache.isPruning.get(this.cacheKey) === true) {
       log.debug('Pruning already in progress. Skipping.');
       return;

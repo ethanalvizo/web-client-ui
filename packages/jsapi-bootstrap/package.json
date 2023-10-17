@@ -1,6 +1,6 @@
 {
   "name": "@deephaven/jsapi-bootstrap",
-  "version": "0.40.1",
+  "version": "0.49.1",
   "description": "Deephaven JSAPI Bootstrap",
   "author": "Deephaven Data Labs LLC",
   "license": "Apache-2.0",
@@ -28,7 +28,6 @@
     "@deephaven/react-hooks": "file:../react-hooks"
   },
   "devDependencies": {
-    "@deephaven/tsconfig": "file:../tsconfig",
     "react": "^17.x"
   },
   "peerDependencies": {

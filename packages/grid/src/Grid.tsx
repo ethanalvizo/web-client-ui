@@ -222,8 +222,8 @@ class Grid extends PureComponent<GridProps, GridState> {
     onMoveColumnComplete: (): void => undefined,
     onMovedRowsChanged: (): void => undefined,
     onMoveRowComplete: (): void => undefined,
-    onViewChanged: (): void => undefined,
-    onTokenClicked: (token: Token) => {
+    onViewChanged: (metrics: GridMetrics): void => undefined,
+    onTokenClicked: (token: Token): void => {
       if (isLinkToken(token)) {
         window.open(token.href, '_blank', 'noopener,noreferrer');
       }
@@ -383,7 +383,7 @@ class Grid extends PureComponent<GridProps, GridState> {
       new GridHorizontalScrollBarMouseHandler(600),
       new GridScrollBarCornerMouseHandler(700),
       new GridRowTreeMouseHandler(800),
-      new GridTokenMouseHandler(825),
+      new GridTokenMouseHandler(875),
       new GridSelectionMouseHandler(900),
     ];
 
@@ -553,12 +553,12 @@ class Grid extends PureComponent<GridProps, GridState> {
 
     window.removeEventListener(
       'mousemove',
-      (this.handleMouseDrag as unknown) as EventListenerOrEventListenerObject,
+      this.handleMouseDrag as unknown as EventListenerOrEventListenerObject,
       true
     );
     window.removeEventListener(
       'mouseup',
-      (this.handleMouseUp as unknown) as EventListenerOrEventListenerObject,
+      this.handleMouseUp as unknown as EventListenerOrEventListenerObject,
       true
     );
     window.removeEventListener('resize', this.handleResize);
@@ -836,7 +836,7 @@ class Grid extends PureComponent<GridProps, GridState> {
   /**
    * Compares the current metrics with the previous metrics to see if we need to scroll when it is stuck to the bottom or the right
    */
-  checkStickyScroll() {
+  checkStickyScroll(): void {
     if (!this.metrics) {
       return;
     }
@@ -1057,12 +1057,8 @@ class Grid extends PureComponent<GridProps, GridState> {
     this.setState((state: GridState) => {
       const { theme } = this.props;
       const { autoSelectRow } = theme;
-      const {
-        selectedRanges,
-        lastSelectedRanges,
-        cursorRow,
-        cursorColumn,
-      } = state;
+      const { selectedRanges, lastSelectedRanges, cursorRow, cursorColumn } =
+        state;
 
       if (
         selectedRanges.length === 1 &&
@@ -1191,12 +1187,8 @@ class Grid extends PureComponent<GridProps, GridState> {
     deltaRow: number,
     extendSelection: boolean
   ): void {
-    const {
-      cursorRow,
-      cursorColumn,
-      selectionEndColumn,
-      selectionEndRow,
-    } = this.state;
+    const { cursorRow, cursorColumn, selectionEndColumn, selectionEndRow } =
+      this.state;
     const column = extendSelection ? selectionEndColumn : cursorColumn;
     const row = extendSelection ? selectionEndRow : cursorRow;
     if (row === null || column === null) {
@@ -1297,12 +1289,8 @@ class Grid extends PureComponent<GridProps, GridState> {
     if (!this.metrics) throw new Error('metrics not set');
 
     const { metricCalculator } = this;
-    const {
-      bottomVisible,
-      rightVisible,
-      topVisible,
-      leftVisible,
-    } = this.metrics;
+    const { bottomVisible, rightVisible, topVisible, leftVisible } =
+      this.metrics;
     const metricState = this.getMetricState(this.state);
     let { top, left, topOffset, leftOffset } = this.state;
 

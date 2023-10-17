@@ -1,4 +1,5 @@
 import React, {
+  ComponentType,
   ForwardRefExoticComponent,
   RefAttributes,
   useEffect,
@@ -22,7 +23,7 @@ import './Dashboard.scss';
 
 const RESIZE_THROTTLE = 100;
 
-const DEFAULT_CALLBACK = () => undefined;
+const DEFAULT_CALLBACK = (): void => undefined;
 
 const EMPTY_OBJECT = Object.freeze({});
 
@@ -40,6 +41,9 @@ export type DashboardProps = {
   >;
   hydrate?: PanelHydrateFunction;
   dehydrate?: PanelDehydrateFunction;
+
+  /** Component to wrap each panel with */
+  panelWrapper?: ComponentType;
 };
 
 export function Dashboard({
@@ -54,6 +58,7 @@ export function Dashboard({
   fallbackComponent = PanelPlaceholder,
   hydrate,
   dehydrate,
+  panelWrapper,
 }: DashboardProps): JSX.Element {
   const layoutElement = useRef<HTMLDivElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -78,7 +83,7 @@ export function Dashboard({
 
       const newLayout = new GoldenLayout(config, layoutElement.current);
 
-      const onInit = () => {
+      const onInit = (): void => {
         newLayout.off('initialised', onInit);
         setIsInitialized(true);
       };
@@ -140,6 +145,7 @@ export function Dashboard({
           onLayoutInitialized={onLayoutInitialized}
           hydrate={hydrate}
           dehydrate={dehydrate}
+          panelWrapper={panelWrapper}
         >
           {children}
         </DashboardLayout>

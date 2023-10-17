@@ -14,6 +14,7 @@ import AppBootstrap from './AppBootstrap';
 const API_URL = 'http://mockserver.net:8111';
 const PLUGINS_URL = 'http://mockserver.net:8111/plugins';
 
+const mockGetServerConfigValues = jest.fn(() => Promise.resolve([]));
 const mockPluginsPromise = Promise.resolve([]);
 jest.mock('../plugins', () => ({
   ...jest.requireActual('../plugins'),
@@ -39,9 +40,9 @@ function expectMockChild() {
 
 function renderComponent(client: CoreClient) {
   const api = TestUtils.createMockProxy<DhType>({
-    CoreClient: (jest
+    CoreClient: jest
       .fn()
-      .mockImplementation(() => client) as unknown) as CoreClient,
+      .mockImplementation(() => client) as unknown as CoreClient,
   });
   return render(
     <ApiContext.Provider value={api}>
@@ -57,6 +58,8 @@ beforeEach(() => {
 });
 
 it('should throw if api has not been bootstrapped', () => {
+  TestUtils.disableConsoleOutput();
+
   expect(() =>
     render(
       <AppBootstrap serverUrl={API_URL} pluginsUrl={PLUGINS_URL}>
@@ -77,6 +80,7 @@ it('should display an error if no login plugin matches the provided auth handler
   const mockLogin = jest.fn(() => Promise.resolve());
   const client = TestUtils.createMockProxy<CoreClient>({
     getAuthConfigValues: mockGetAuthConfigValues,
+    getServerConfigValues: mockGetServerConfigValues,
     login: mockLogin,
   });
   renderComponent(client);
@@ -119,9 +123,10 @@ it('should log in automatically when the anonymous handler is supported', async 
   );
   const mockConnection = TestUtils.createMockProxy<IdeConnection>({});
   const client = TestUtils.createMockProxy<CoreClient>({
-    getAuthConfigValues: mockGetAuthConfigValues,
-    login: mockLogin,
     getAsIdeConnection: mockGetAsConnection,
+    getAuthConfigValues: mockGetAuthConfigValues,
+    getServerConfigValues: mockGetServerConfigValues,
+    login: mockLogin,
   });
 
   renderComponent(client);

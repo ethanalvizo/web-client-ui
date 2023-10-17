@@ -3,6 +3,100 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.49.1](https://github.com/deephaven/web-client-ui/compare/v0.49.0...v0.49.1) (2023-09-27)
+
+
+### Bug Fixes
+
+* Dehydration of class components ([#1535](https://github.com/deephaven/web-client-ui/issues/1535)) ([3e834de](https://github.com/deephaven/web-client-ui/commit/3e834de31a5ba8df8041637ece4aacfa7fbcd794)), closes [#1534](https://github.com/deephaven/web-client-ui/issues/1534)
+
+
+
+
+
+# [0.49.0](https://github.com/deephaven/web-client-ui/compare/v0.48.0...v0.49.0) (2023-09-15)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+
+
+
+
+# [0.48.0](https://github.com/deephaven/web-client-ui/compare/v0.47.0...v0.48.0) (2023-09-12)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+
+
+
+
+# [0.47.0](https://github.com/deephaven/web-client-ui/compare/v0.46.1...v0.47.0) (2023-09-08)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+
+
+
+
+## [0.46.1](https://github.com/deephaven/web-client-ui/compare/v0.46.0...v0.46.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* Remove unused ref forwarded to all dashboard panels ([#1451](https://github.com/deephaven/web-client-ui/issues/1451)) ([938aa07](https://github.com/deephaven/web-client-ui/commit/938aa0724abb58b09d8ce1d339766b1072c95202))
+
+
+
+
+
+# [0.46.0](https://github.com/deephaven/web-client-ui/compare/v0.45.1...v0.46.0) (2023-08-18)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+
+
+
+
+# [0.45.0](https://github.com/deephaven/web-client-ui/compare/v0.44.1...v0.45.0) (2023-07-31)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+# [0.44.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.44.0) (2023-07-07)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+# [0.43.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.43.0) (2023-07-07)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+# [0.42.0](https://github.com/deephaven/web-client-ui/compare/v0.41.1...v0.42.0) (2023-06-29)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+# [0.41.0](https://github.com/deephaven/web-client-ui/compare/v0.40.4...v0.41.0) (2023-06-08)
+
+### Bug Fixes
+
+- Catch errors when emitting events to prevent breaking entire layout ([#1353](https://github.com/deephaven/web-client-ui/issues/1353)) ([aac5bd2](https://github.com/deephaven/web-client-ui/commit/aac5bd2ad4aeb88ac1fb18236f7bfb983ae35cf0)), closes [#1352](https://github.com/deephaven/web-client-ui/issues/1352)
+
+### Features
+
+- Improve golden layout tab overflow drop down behaviour ([#1330](https://github.com/deephaven/web-client-ui/issues/1330)) ([9331822](https://github.com/deephaven/web-client-ui/commit/933182277eb4226caa45871d651789a70fc573d3))
+
+## [0.40.4](https://github.com/deephaven/web-client-ui/compare/v0.40.3...v0.40.4) (2023-06-02)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+## [0.40.3](https://github.com/deephaven/web-client-ui/compare/v0.40.2...v0.40.3) (2023-05-31)
+
+### Reverts
+
+- "refactor: Clean up golden-layout css ([#1322](https://github.com/deephaven/web-client-ui/issues/1322))" ([#1334](https://github.com/deephaven/web-client-ui/issues/1334)) ([2f7928a](https://github.com/deephaven/web-client-ui/commit/2f7928a67e14f2026aef73cee542045ce7477351))
+
+## [0.40.2](https://github.com/deephaven/web-client-ui/compare/v0.40.1...v0.40.2) (2023-05-31)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
 # [0.40.0](https://github.com/deephaven/web-client-ui/compare/v0.39.0...v0.40.0) (2023-05-19)
 
 ### Features

@@ -65,8 +65,13 @@ class InputFilterPanel extends Component<
 
     const { panelState } = props;
     // if panelstate is null, use destructured defaults
-    const { value, isValueShown = false, name, type, timestamp } =
-      panelState ?? {};
+    const {
+      value,
+      isValueShown = false,
+      name,
+      type,
+      timestamp,
+    } = panelState ?? {};
 
     this.state = {
       columns: [],
@@ -81,7 +86,7 @@ class InputFilterPanel extends Component<
     };
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.updateColumns();
 
     const { column, value, timestamp } = this.state;
@@ -91,7 +96,7 @@ class InputFilterPanel extends Component<
     }
   }
 
-  componentDidUpdate(prevProps: InputFilterPanelProps) {
+  componentDidUpdate(prevProps: InputFilterPanelProps): void {
     const { columns } = this.props;
     if (columns !== prevProps.columns) {
       this.updateColumns();
@@ -108,7 +113,7 @@ class InputFilterPanel extends Component<
     column?: InputFilterColumn;
     isValueShown?: boolean;
     value?: string;
-  }) {
+  }): void {
     let name: string | undefined;
     let type: string | undefined;
     if (column != null) {
@@ -157,7 +162,12 @@ class InputFilterPanel extends Component<
     this.inputFilterRef.current?.clearFilter();
   }
 
-  sendUpdate(name?: string, type?: string, value?: string, timestamp?: number) {
+  sendUpdate(
+    name?: string,
+    type?: string,
+    value?: string,
+    timestamp?: number
+  ): void {
     const { glEventHub } = this.props;
     glEventHub.emit(InputFilterEvent.FILTERS_CHANGED, this, {
       name,
@@ -172,7 +182,7 @@ class InputFilterPanel extends Component<
    * @param state Filter state to set
    * @param sendUpdate Emit filters changed event if true
    */
-  setPanelState(state: PanelState, sendUpdate = false) {
+  setPanelState(state: PanelState, sendUpdate = false): void {
     // Set the skipUpdate flag so the next onChange handler call doesn't emit the FILTERS_CHANGED event
     this.setState({ skipUpdate: !sendUpdate });
 
@@ -181,7 +191,7 @@ class InputFilterPanel extends Component<
     this.inputFilterRef.current?.setFilterState(state);
   }
 
-  updateColumns() {
+  updateColumns(): void {
     const { columns } = this.props;
     if (columns == null) {
       return;
@@ -210,7 +220,7 @@ class InputFilterPanel extends Component<
     });
   }
 
-  render() {
+  render(): JSX.Element {
     const { glContainer, glEventHub } = this.props;
     const { column, columns, isValueShown, value } = this.state;
     return (
@@ -239,7 +249,7 @@ class InputFilterPanel extends Component<
 const mapStateToProps = (
   state: RootState,
   ownProps: { localDashboardId: string }
-) => {
+): Pick<InputFilterPanelProps, 'columns'> => {
   const { localDashboardId } = ownProps;
 
   return {

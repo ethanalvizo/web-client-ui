@@ -18,13 +18,13 @@ import { ExportedLayout } from '../storage/LayoutStorage';
 function StyleGuideInit(props: {
   workspace: Workspace;
   setWorkspace: PayloadActionCreator<Workspace>;
-}) {
+}): JSX.Element | null {
   const { workspace, setWorkspace } = props;
 
   useEffect(() => {
     LocalWorkspaceStorage.makeDefaultWorkspace({
       getLayouts: async () => [] as string[],
-      getLayout: async () => ({} as ExportedLayout),
+      getLayout: async () => ({}) as ExportedLayout,
     }).then(setWorkspace);
   }, [setWorkspace]);
 
@@ -40,7 +40,11 @@ StyleGuideInit.defaultProps = {
   workspace: null,
 };
 
-const mapStateToProps = (state: RootState) => ({
+const mapStateToProps = (
+  state: RootState
+): {
+  workspace: Workspace;
+} => ({
   workspace: getWorkspace(state),
 });
 

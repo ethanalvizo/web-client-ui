@@ -82,14 +82,14 @@ export type DehydratedAdvancedFilter = [
   number,
   {
     options: AdvancedFilterOptions;
-  }
+  },
 ];
 
 export type DehydratedQuickFilter = [
   number,
   {
     text: string;
-  }
+  },
 ];
 
 export type DehydratedCustomColumnFormat = [string, FormattingRule];
@@ -117,7 +117,7 @@ export interface TableSettings {
   inputFilters?: readonly InputFilter[];
   sorts?: readonly (DehydratedSort | LegacyDehydratedSort)[];
   partition?: unknown;
-  partitionColumn?: ColumnName;
+  partitionColumn?: ColumnName | null;
 }
 
 export interface DehydratedIrisGridState {
@@ -176,12 +176,8 @@ class IrisGridUtils {
     movedColumns: { from: string | [string, string]; to: string }[];
     movedRows: MoveOperation[];
   } {
-    const {
-      isStuckToBottom,
-      isStuckToRight,
-      movedColumns,
-      movedRows,
-    } = gridState;
+    const { isStuckToBottom, isStuckToRight, movedColumns, movedRows } =
+      gridState;
 
     const { columns } = model;
 
@@ -229,17 +225,12 @@ class IrisGridUtils {
     IrisGridProps,
     'isStuckToBottom' | 'isStuckToRight' | 'movedColumns' | 'movedRows'
   > {
-    const {
-      isStuckToBottom,
-      isStuckToRight,
-      movedColumns,
-      movedRows,
-    } = gridState;
+    const { isStuckToBottom, isStuckToRight, movedColumns, movedRows } =
+      gridState;
 
     const { columns } = model;
-    const customColumnNames = IrisGridUtils.parseCustomColumnNames(
-      customColumns
-    );
+    const customColumnNames =
+      IrisGridUtils.parseCustomColumnNames(customColumns);
     const columnNames = columns
       .map(({ name }) => name)
       .concat(customColumnNames);
@@ -249,7 +240,7 @@ class IrisGridUtils {
       isStuckToRight,
       movedColumns: [...movedColumns]
         .map(({ to, from }) => {
-          const getIndex = (x: string | number) =>
+          const getIndex = (x: string | number): number =>
             typeof x === 'string'
               ? columnNames.findIndex(name => name === x)
               : x;
@@ -284,14 +275,14 @@ class IrisGridUtils {
     irisGridPanelState: {
       // This needs to be changed after IrisGridPanel is done
       isSelectingPartition: boolean;
-      partition: string | undefined;
-      partitionColumn: Column | undefined;
+      partition: string | null;
+      partitionColumn: Column | null;
       advancedSettings: Map<AdvancedSettingsType, boolean>;
     }
   ): {
     isSelectingPartition: boolean;
-    partition: string | undefined;
-    partitionColumn: ColumnName | undefined;
+    partition: string | null;
+    partitionColumn: ColumnName | null;
     advancedSettings: [AdvancedSettingsType, boolean][];
   } {
     const {
@@ -301,11 +292,11 @@ class IrisGridUtils {
       advancedSettings,
     } = irisGridPanelState;
 
+    // Return value will be serialized, should not contain undefined
     return {
       isSelectingPartition,
       partition,
-      partitionColumn:
-        partitionColumn != null ? partitionColumn.name : undefined,
+      partitionColumn: partitionColumn != null ? partitionColumn.name : null,
       advancedSettings: [...advancedSettings],
     };
   }
@@ -321,14 +312,14 @@ class IrisGridUtils {
     irisGridPanelState: {
       // This needs to be changed after IrisGridPanel is done
       isSelectingPartition: boolean;
-      partition: string | undefined;
-      partitionColumn: ColumnName | undefined;
+      partition: string | null | undefined;
+      partitionColumn: ColumnName | null | undefined;
       advancedSettings: [AdvancedSettingsType, boolean][];
     }
   ): {
     isSelectingPartition: boolean;
-    partition?: string;
-    partitionColumn?: Column;
+    partition: string | null;
+    partitionColumn: Column | null;
     advancedSettings: Map<AdvancedSettingsType, boolean>;
   } {
     const {
@@ -341,11 +332,11 @@ class IrisGridUtils {
     const { columns } = model;
     return {
       isSelectingPartition,
-      partition,
+      partition: partition ?? null,
       partitionColumn:
         partitionColumn != null
-          ? IrisGridUtils.getColumnByName(columns, partitionColumn)
-          : undefined,
+          ? IrisGridUtils.getColumnByName(columns, partitionColumn) ?? null
+          : null,
       advancedSettings: new Map([
         ...AdvancedSettings.DEFAULTS,
         ...advancedSettings,
@@ -396,13 +387,13 @@ class IrisGridUtils {
     panelState: {
       irisGridState: { advancedFilters: AF; quickFilters: QF; sorts: S };
       irisGridPanelState: {
-        partitionColumn?: ColumnName;
-        partition?: unknown;
+        partitionColumn: ColumnName | null;
+        partition: unknown;
       };
     },
     inputFilters: InputFilter[] = []
   ): {
-    partitionColumn: ColumnName | undefined;
+    partitionColumn: ColumnName | null;
     partition: unknown;
     advancedFilters: AF;
     inputFilters: InputFilter[];
@@ -473,12 +464,10 @@ class IrisGridUtils {
     oldCustomColumns: readonly ColumnName[],
     customColumns: readonly ColumnName[]
   ): ColumnName[] {
-    const oldCustomColumnsNames = IrisGridUtils.parseCustomColumnNames(
-      oldCustomColumns
-    );
-    const customColumnNames = IrisGridUtils.parseCustomColumnNames(
-      customColumns
-    );
+    const oldCustomColumnsNames =
+      IrisGridUtils.parseCustomColumnNames(oldCustomColumns);
+    const customColumnNames =
+      IrisGridUtils.parseCustomColumnNames(customColumns);
     return oldCustomColumnsNames.filter(
       oldCustomColumnName => !customColumnNames.includes(oldCustomColumnName)
     );
@@ -1181,6 +1170,7 @@ class IrisGridUtils {
     assertNotNull(metrics);
     const { userColumnWidths, userRowHeights } = metrics;
     const { columns } = model;
+    // Return value will be serialized, should not contain undefined
     return {
       advancedFilters: this.dehydrateAdvancedFilters(columns, advancedFilters),
       aggregationSettings,
@@ -1269,18 +1259,20 @@ class IrisGridUtils {
       sorts: this.hydrateSort(columns, sorts),
       userColumnWidths: new Map(
         userColumnWidths
-          .map(([column, width]: [string | number, number]): [
-            number,
-            number
-          ] => {
-            if (
-              typeof column === 'string' ||
-              (column as unknown) instanceof String
-            ) {
-              return [columns.findIndex(({ name }) => name === column), width];
+          .map(
+            ([column, width]: [string | number, number]): [number, number] => {
+              if (
+                typeof column === 'string' ||
+                (column as unknown) instanceof String
+              ) {
+                return [
+                  columns.findIndex(({ name }) => name === column),
+                  width,
+                ];
+              }
+              return [column, width];
             }
-            return [column, width];
-          })
+          )
           .filter(
             ([column]) =>
               column != null && column >= 0 && column < columns.length
@@ -1323,7 +1315,7 @@ class IrisGridUtils {
     const importedFilters = savedQuickFilters.map(
       ([columnIndex, quickFilter]: DehydratedQuickFilter): [
         number,
-        { text: string; filter: FilterCondition | null }
+        { text: string; filter: FilterCondition | null },
       ] => {
         const { text } = quickFilter;
 
@@ -1380,7 +1372,7 @@ class IrisGridUtils {
     const importedFilters = savedAdvancedFilters.map(
       ([columnIndex, advancedFilter]: DehydratedAdvancedFilter): [
         number,
-        { options: AdvancedFilterOptions; filter: FilterCondition | null }
+        { options: AdvancedFilterOptions; filter: FilterCondition | null },
       ] => {
         const column = IrisGridUtils.getColumn(columns, columnIndex);
         assertNotNull(column);
@@ -1464,7 +1456,7 @@ class IrisGridUtils {
     { data: Map<ModelIndex | null, string | CellData | LongWrapper | null> }
   > {
     const columnMap = new Map<ColumnName, number>();
-    const getColumnIndex = (columnName: ColumnName) => {
+    const getColumnIndex = (columnName: ColumnName): number | undefined => {
       if (!columnMap.has(columnName)) {
         columnMap.set(
           columnName,
@@ -1478,7 +1470,7 @@ class IrisGridUtils {
       pendingDataMap.map(
         ([rowIndex, { data }]: [
           number,
-          { data: [string, CellData | string | null][] }
+          { data: [string, CellData | string | null][] },
         ]) => [
           rowIndex,
           {
@@ -1506,7 +1498,7 @@ class IrisGridUtils {
   dehydrateValue<T>(value: T, columnType: string): string | T | null {
     if (TableUtils.isDateType(columnType)) {
       return this.dehydrateDateTime(
-        (value as unknown) as number | DateWrapper | Date
+        value as unknown as number | DateWrapper | Date
       );
     }
 
@@ -1527,11 +1519,11 @@ class IrisGridUtils {
     columnType: string
   ): DateWrapper | LongWrapper | T | null {
     if (TableUtils.isDateType(columnType)) {
-      return this.hydrateDateTime((value as unknown) as string);
+      return this.hydrateDateTime(value as unknown as string);
     }
 
     if (TableUtils.isLongType(columnType)) {
-      return this.hydrateLong((value as unknown) as string);
+      return this.hydrateLong(value as unknown as string);
     }
 
     return value;

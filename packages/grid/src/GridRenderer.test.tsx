@@ -3,12 +3,13 @@ import GridModel from './GridModel';
 import GridRenderer from './GridRenderer';
 import MockGridModel from './MockGridModel';
 import GridTheme from './GridTheme';
+import TextCellRenderer from './TextCellRenderer';
 import { LinkToken } from './GridUtils';
 import { GridRenderState } from './GridRendererTypes';
 
 const makeMockContext = (): CanvasRenderingContext2D =>
   // Just return a partial mock
-  (({
+  ({
     arc: jest.fn(),
     beginPath: jest.fn(),
     clip: jest.fn(),
@@ -20,7 +21,7 @@ const makeMockContext = (): CanvasRenderingContext2D =>
     fillRect: jest.fn(),
     fillText: jest.fn(),
     lineTo: jest.fn(),
-    measureText: jest.fn(str => ({ width: str.length * 10 } as TextMetrics)),
+    measureText: jest.fn(str => ({ width: str.length * 10 }) as TextMetrics),
     moveTo: jest.fn(),
     rect: jest.fn(),
     restore: jest.fn(),
@@ -31,7 +32,7 @@ const makeMockContext = (): CanvasRenderingContext2D =>
     translate: jest.fn(),
     scale: jest.fn(),
     createPattern: jest.fn(),
-  } as unknown) as CanvasRenderingContext2D);
+  }) as unknown as CanvasRenderingContext2D;
 
 const makeMockGridMetrics = (): GridMetrics =>
   ({
@@ -65,7 +66,7 @@ const makeMockGridMetrics = (): GridMetrics =>
       [1, 10],
       [2, 10],
     ]),
-  } as GridMetrics);
+  }) as GridMetrics;
 
 const makeMockGridRenderState = ({
   metrics = makeMockGridMetrics(),
@@ -116,7 +117,10 @@ describe('getTokenBoxesForVisibleCell', () => {
       }),
     });
 
-    renderer.getCachedTruncatedString = jest.fn(
+    const textCellRenderer = renderer.getCellRenderer(
+      'text'
+    ) as TextCellRenderer;
+    textCellRenderer.getCachedTruncatedString = jest.fn(
       (
         context: CanvasRenderingContext2D,
         text: string,
@@ -128,7 +132,14 @@ describe('getTokenBoxesForVisibleCell', () => {
   });
 
   it('should return tokens that are visible in the cell', () => {
-    const tokens = renderer.getTokenBoxesForVisibleCell(0, 0, renderState);
+    const textCellRenderer = renderer.getCellRenderer(
+      'text'
+    ) as TextCellRenderer;
+    const tokens = textCellRenderer.getTokenBoxesForVisibleCell(
+      0,
+      0,
+      renderState
+    );
 
     const expectedValue: LinkToken = {
       type: 'url',
@@ -144,7 +155,14 @@ describe('getTokenBoxesForVisibleCell', () => {
   });
 
   it('should return multiple tokens', () => {
-    const tokens = renderer.getTokenBoxesForVisibleCell(0, 2, renderState);
+    const textCellRenderer = renderer.getCellRenderer(
+      'text'
+    ) as TextCellRenderer;
+    const tokens = textCellRenderer.getTokenBoxesForVisibleCell(
+      0,
+      2,
+      renderState
+    );
 
     const expectedValue: LinkToken[] = [
       {
@@ -173,7 +191,14 @@ describe('getTokenBoxesForVisibleCell', () => {
   });
 
   it('should return empty array if there are no tokens', () => {
-    const tokens = renderer.getTokenBoxesForVisibleCell(0, 1, renderState);
+    const textCellRenderer = renderer.getCellRenderer(
+      'text'
+    ) as TextCellRenderer;
+    const tokens = textCellRenderer.getTokenBoxesForVisibleCell(
+      0,
+      1,
+      renderState
+    );
 
     expect(tokens).toHaveLength(0);
   });
@@ -181,7 +206,14 @@ describe('getTokenBoxesForVisibleCell', () => {
   it('should return empty array if context or metrics is null', () => {
     // @ts-expect-error metrics and context usually can't be null
     renderState = makeMockGridRenderState({ metrics: null, context: null });
-    const tokens = renderer.getTokenBoxesForVisibleCell(0, 0, renderState);
+    const textCellRenderer = renderer.getCellRenderer(
+      'text'
+    ) as TextCellRenderer;
+    const tokens = textCellRenderer.getTokenBoxesForVisibleCell(
+      0,
+      0,
+      renderState
+    );
 
     expect(tokens).toHaveLength(0);
   });

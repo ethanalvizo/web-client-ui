@@ -34,6 +34,7 @@ import InputFilterPanel, {
   PanelState as InputFilterPanelState,
 } from './InputFilterPanel';
 import './FilterSetManagerPanel.scss';
+import { FilterChangeEvent } from '../FilterPlugin';
 
 const log = Log.module('FilterSetManagerPanel');
 interface IrisGridState {
@@ -72,15 +73,15 @@ interface FilterSetManagerPanelState {
   panelState: PanelState; // Dehydrated panel state that can load this panel
 }
 
-function hasSetPanelState(
-  panel: PanelComponent
-): panel is PanelComponent & {
+function hasSetPanelState(panel: PanelComponent): panel is PanelComponent & {
   setPanelState: (state: InputFilterPanelState) => void;
 } {
   return (
-    (panel as PanelComponent & {
-      setPanelState: (state: InputFilterPanelState) => void;
-    }).setPanelState != null
+    (
+      panel as PanelComponent & {
+        setPanelState: (state: InputFilterPanelState) => void;
+      }
+    ).setPanelState != null
   );
 }
 export class FilterSetManagerPanel extends Component<
@@ -410,7 +411,12 @@ export class FilterSetManagerPanel extends Component<
 const mapStateToProps = (
   state: RootState,
   ownProps: { localDashboardId: string }
-) => {
+): Pick<
+  FilterSetManagerPanelProps,
+  'dashboardOpenedPanelMap' | 'filterSets' | 'panelTableMap'
+> & {
+  dashboardInputFilters: FilterChangeEvent[];
+} => {
   const { localDashboardId } = ownProps;
   return {
     filterSets: getFilterSetsForDashboard(state, localDashboardId),

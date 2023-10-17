@@ -3,6 +3,281 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.49.1](https://github.com/deephaven/web-client-ui/compare/v0.49.0...v0.49.1) (2023-09-27)
+
+
+### Bug Fixes
+
+* Copy did not work from embedded iframes ([#1528](https://github.com/deephaven/web-client-ui/issues/1528)) ([3549a33](https://github.com/deephaven/web-client-ui/commit/3549a33c6152660ed44601eb2e03312d694e6167)), closes [#1527](https://github.com/deephaven/web-client-ui/issues/1527)
+* Dehydration of class components ([#1535](https://github.com/deephaven/web-client-ui/issues/1535)) ([3e834de](https://github.com/deephaven/web-client-ui/commit/3e834de31a5ba8df8041637ece4aacfa7fbcd794)), closes [#1534](https://github.com/deephaven/web-client-ui/issues/1534)
+* inconsistent drag for webkit ([#1518](https://github.com/deephaven/web-client-ui/issues/1518)) ([cd5408c](https://github.com/deephaven/web-client-ui/commit/cd5408c7f814cb96c2697b7c67fe27883ecdf779)), closes [#1360](https://github.com/deephaven/web-client-ui/issues/1360)
+* Render tables partitioned by non-string columns ([#1533](https://github.com/deephaven/web-client-ui/issues/1533)) ([585b2ff](https://github.com/deephaven/web-client-ui/commit/585b2ffc533dd95ff56247627c7ea1e0928f337b)), closes [#1441](https://github.com/deephaven/web-client-ui/issues/1441)
+* Right clicking with a custom context menu open should open another context menu ([#1526](https://github.com/deephaven/web-client-ui/issues/1526)) ([bd08e1f](https://github.com/deephaven/web-client-ui/commit/bd08e1fa50d938a94ead82f55b365b7c00e8d8f0)), closes [#1525](https://github.com/deephaven/web-client-ui/issues/1525)
+
+
+
+
+
+# [0.49.0](https://github.com/deephaven/web-client-ui/compare/v0.48.0...v0.49.0) (2023-09-15)
+
+
+### Bug Fixes
+
+* Plugin peer dependencies do not get versions from lerna ([#1517](https://github.com/deephaven/web-client-ui/issues/1517)) ([322f6ff](https://github.com/deephaven/web-client-ui/commit/322f6ff7d2ef949774bab61527e5e1c32f344da6))
+* Table overflow button has lower priority than grid tokens ([#1510](https://github.com/deephaven/web-client-ui/issues/1510)) ([32e6d20](https://github.com/deephaven/web-client-ui/commit/32e6d208d0977092f315caa122b8ab23f0fc110a)), closes [#1480](https://github.com/deephaven/web-client-ui/issues/1480)
+
+
+### Code Refactoring
+
+* Improve table saver to always use the correct service worker ([#1515](https://github.com/deephaven/web-client-ui/issues/1515)) ([2488e52](https://github.com/deephaven/web-client-ui/commit/2488e52fdeda16604be2516c30782d6127be9317)), closes [#766](https://github.com/deephaven/web-client-ui/issues/766)
+
+
+### Features
+
+* Update go to row panel's row number with cursorRow ([#1508](https://github.com/deephaven/web-client-ui/issues/1508)) ([23ab5cc](https://github.com/deephaven/web-client-ui/commit/23ab5cc0f798304a274ed2de2473cc9c74ca84cb)), closes [#1406](https://github.com/deephaven/web-client-ui/issues/1406)
+
+
+### BREAKING CHANGES
+
+* `TableSaver` now expects the service worker to send it
+a complete URL for download instead of just a file name. DHE will need
+to adjust its `serviceWorker.js` to incorporate the same changes from
+this PR.
+
+
+
+
+
+# [0.48.0](https://github.com/deephaven/web-client-ui/compare/v0.47.0...v0.48.0) (2023-09-12)
+
+
+### Bug Fixes
+
+* Hide "Append Command" button when viewing partition aware table in iframe UI ([#1495](https://github.com/deephaven/web-client-ui/issues/1495)) ([d15d6b1](https://github.com/deephaven/web-client-ui/commit/d15d6b1d174acd77c63c2dfc28a49ca08a4cd0ab)), closes [#1414](https://github.com/deephaven/web-client-ui/issues/1414)
+* webpack dynamic import ([#1509](https://github.com/deephaven/web-client-ui/issues/1509)) ([1e8bb72](https://github.com/deephaven/web-client-ui/commit/1e8bb727993fdeb7b965f60d72d6353ae3538ac5))
+
+
+### Features
+
+* Expose containerRef from ChartPanel ([#1500](https://github.com/deephaven/web-client-ui/issues/1500)) ([848fef4](https://github.com/deephaven/web-client-ui/commit/848fef4fe653193a2b49c4a45ccffe29349a821d))
+
+
+
+
+
+# [0.47.0](https://github.com/deephaven/web-client-ui/compare/v0.46.1...v0.47.0) (2023-09-08)
+
+
+### Bug Fixes
+
+* Change dynamic import to string ([#1484](https://github.com/deephaven/web-client-ui/issues/1484)) ([45e2ada](https://github.com/deephaven/web-client-ui/commit/45e2adae7df804b8982ca3cd9df89db3422ac9cf))
+* Console History Not Scrolling to Bottom (DH-14062) ([#1481](https://github.com/deephaven/web-client-ui/issues/1481)) ([93687a7](https://github.com/deephaven/web-client-ui/commit/93687a78fa2d0e2da567efd8da2c671252ba8fe5))
+* Forbid [@deephaven](https://github.com/deephaven) modules from self importing ([#1499](https://github.com/deephaven/web-client-ui/issues/1499)) ([81cdd65](https://github.com/deephaven/web-client-ui/commit/81cdd6512456bcc08fde776670659a6028841875)), closes [#1497](https://github.com/deephaven/web-client-ui/issues/1497)
+* quick filter focus text doesn't match canvas text ([#1475](https://github.com/deephaven/web-client-ui/issues/1475)) ([02841b5](https://github.com/deephaven/web-client-ui/commit/02841b5a9dedc25160f319a072636335aa77599f)), closes [#1472](https://github.com/deephaven/web-client-ui/issues/1472)
+* Remove totals table rows from displayed row count ([#1492](https://github.com/deephaven/web-client-ui/issues/1492)) ([f686891](https://github.com/deephaven/web-client-ui/commit/f68689121c7df098dbf86fa76bf2ccf8dbda6566)), closes [#1407](https://github.com/deephaven/web-client-ui/issues/1407)
+
+
+### Features
+
+* adds copy file support to file explorer and fixes rename bug ([#1491](https://github.com/deephaven/web-client-ui/issues/1491)) ([d35aa49](https://github.com/deephaven/web-client-ui/commit/d35aa495f2ee2f17a9053c46a13e5982614bed6c)), closes [#185](https://github.com/deephaven/web-client-ui/issues/185) [#1375](https://github.com/deephaven/web-client-ui/issues/1375) [#1488](https://github.com/deephaven/web-client-ui/issues/1488)
+* bindAllMethods util function ([#1476](https://github.com/deephaven/web-client-ui/issues/1476)) ([0dab8d7](https://github.com/deephaven/web-client-ui/commit/0dab8d70f299441271fe7047f9d4f2eb48a6d8be)), closes [#1474](https://github.com/deephaven/web-client-ui/issues/1474)
+* Consolidate and normalize plugin types ([#1456](https://github.com/deephaven/web-client-ui/issues/1456)) ([43a782d](https://github.com/deephaven/web-client-ui/commit/43a782dd3ebf582b18e155fdbc313176b0bf0f84)), closes [#1454](https://github.com/deephaven/web-client-ui/issues/1454) [#1451](https://github.com/deephaven/web-client-ui/issues/1451)
+
+
+
+
+
+## [0.46.1](https://github.com/deephaven/web-client-ui/compare/v0.46.0...v0.46.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* flaky e2e tests ([#1453](https://github.com/deephaven/web-client-ui/issues/1453)) ([d59e9be](https://github.com/deephaven/web-client-ui/commit/d59e9bed95152170626265a00ea27d716e1b2bcb))
+* Heap usage request throttling ([#1450](https://github.com/deephaven/web-client-ui/issues/1450)) ([5cc2936](https://github.com/deephaven/web-client-ui/commit/5cc2936332a993c633d9f2f5087b68c98a1e5f97)), closes [#1439](https://github.com/deephaven/web-client-ui/issues/1439) [#1](https://github.com/deephaven/web-client-ui/issues/1) [#2](https://github.com/deephaven/web-client-ui/issues/2) [#3](https://github.com/deephaven/web-client-ui/issues/3) [#1](https://github.com/deephaven/web-client-ui/issues/1) [#2](https://github.com/deephaven/web-client-ui/issues/2) [#3](https://github.com/deephaven/web-client-ui/issues/3) [#4](https://github.com/deephaven/web-client-ui/issues/4) [#5](https://github.com/deephaven/web-client-ui/issues/5) [#6](https://github.com/deephaven/web-client-ui/issues/6) [#7](https://github.com/deephaven/web-client-ui/issues/7) [#8](https://github.com/deephaven/web-client-ui/issues/8) [#9](https://github.com/deephaven/web-client-ui/issues/9) [#10](https://github.com/deephaven/web-client-ui/issues/10) [#11](https://github.com/deephaven/web-client-ui/issues/11) [#12](https://github.com/deephaven/web-client-ui/issues/12) [#13](https://github.com/deephaven/web-client-ui/issues/13) [#14](https://github.com/deephaven/web-client-ui/issues/14) [#15](https://github.com/deephaven/web-client-ui/issues/15) [#16](https://github.com/deephaven/web-client-ui/issues/16) [#17](https://github.com/deephaven/web-client-ui/issues/17) [#18](https://github.com/deephaven/web-client-ui/issues/18) [#19](https://github.com/deephaven/web-client-ui/issues/19) [#20](https://github.com/deephaven/web-client-ui/issues/20) [#21](https://github.com/deephaven/web-client-ui/issues/21) [#22](https://github.com/deephaven/web-client-ui/issues/22) [#23](https://github.com/deephaven/web-client-ui/issues/23) [#24](https://github.com/deephaven/web-client-ui/issues/24) [#25](https://github.com/deephaven/web-client-ui/issues/25) [#26](https://github.com/deephaven/web-client-ui/issues/26) [#27](https://github.com/deephaven/web-client-ui/issues/27) [#1](https://github.com/deephaven/web-client-ui/issues/1) [#2](https://github.com/deephaven/web-client-ui/issues/2) [#3](https://github.com/deephaven/web-client-ui/issues/3) [#4](https://github.com/deephaven/web-client-ui/issues/4) [#5](https://github.com/deephaven/web-client-ui/issues/5)
+* Heap usage should tick immediately when dependencies change ([#1468](https://github.com/deephaven/web-client-ui/issues/1468)) ([96b27a5](https://github.com/deephaven/web-client-ui/commit/96b27a50695eafaaf55d3a103c4c349225806afa)), closes [#1464](https://github.com/deephaven/web-client-ui/issues/1464)
+* legal notices dismisses on click anywhere ([#1452](https://github.com/deephaven/web-client-ui/issues/1452)) ([a189375](https://github.com/deephaven/web-client-ui/commit/a18937562f6e9ce2d62b27f79a60adc341a435e9))
+* Remove unused ref forwarded to all dashboard panels ([#1451](https://github.com/deephaven/web-client-ui/issues/1451)) ([938aa07](https://github.com/deephaven/web-client-ui/commit/938aa0724abb58b09d8ce1d339766b1072c95202))
+* Zip CSV uploads not working ([#1457](https://github.com/deephaven/web-client-ui/issues/1457)) ([08d0296](https://github.com/deephaven/web-client-ui/commit/08d0296fee6a695c8312dec7d3bed648f10c7acb)), closes [#1080](https://github.com/deephaven/web-client-ui/issues/1080) [#1416](https://github.com/deephaven/web-client-ui/issues/1416)
+
+
+
+
+
+# [0.46.0](https://github.com/deephaven/web-client-ui/compare/v0.45.1...v0.46.0) (2023-08-18)
+
+
+### Bug Fixes
+
+* Environment variable replacement in styleguide ([#1443](https://github.com/deephaven/web-client-ui/issues/1443)) ([9fd5c27](https://github.com/deephaven/web-client-ui/commit/9fd5c27df9af4c6e63117e07f90c2fdc3029dfe1))
+* failing table operations e2e test ([#1447](https://github.com/deephaven/web-client-ui/issues/1447)) ([6d2cb06](https://github.com/deephaven/web-client-ui/commit/6d2cb062665b0ba60b3397ed74f9b703d598f154))
+* login page looks bad when narrow ([#1428](https://github.com/deephaven/web-client-ui/issues/1428)) ([6e0b60e](https://github.com/deephaven/web-client-ui/commit/6e0b60e2087465eb99230411334fc2ee355c0778)), closes [#1399](https://github.com/deephaven/web-client-ui/issues/1399)
+* Upgrade Monaco to ^0.41.0 ([#1448](https://github.com/deephaven/web-client-ui/issues/1448)) ([1120c2b](https://github.com/deephaven/web-client-ui/commit/1120c2b235d2ca2c8b14c818ccfc2847294c3811)), closes [#1445](https://github.com/deephaven/web-client-ui/issues/1445) [#1191](https://github.com/deephaven/web-client-ui/issues/1191)
+
+
+### Build System
+
+* **@deephaven/icons:** Properly package icons and remove unnecessary files in dist ([#1437](https://github.com/deephaven/web-client-ui/issues/1437)) ([ec7ccef](https://github.com/deephaven/web-client-ui/commit/ec7ccefc8c65ce6ea01622d509d4c654324fa401))
+
+
+### BREAKING CHANGES
+
+* Monaco will need to be upgraded to ^0.41.0 in
+Enterprise to ensure compatibility
+
+**Tests Performed**
+
+- Console Input
+    - `Cmd+F` does nothing
+    - Intellisense can be closed via `Esc`
+- Log tab
+    - `Esc` does not close find input
+    - `Esc` does clear selection when focus is in the log content
+- Code Editor
+- Verified that newline with leading space no longer crashes the browser
+tab
+      ```
+      a
+       a
+      ```
+- Wrote some Python code. Intellisense, syntax highlighting, and general
+typing experience seemed as expected
+   - Execute full code + selected code successfully
+* **@deephaven/icons:** Any imports/aliasing to `@deephaven/icons/dist` should
+be removed and just read the package contents normally (e.g. DHE jest
+and vite configs for using community packages locally). See the changes
+to vite and jest configs in this change for how to update
+
+
+
+
+
+## [0.45.1](https://github.com/deephaven/web-client-ui/compare/v0.45.0...v0.45.1) (2023-08-01)
+
+
+### Bug Fixes
+
+* Cannot import CSV with LOCAL_TIME ([#1434](https://github.com/deephaven/web-client-ui/issues/1434)) ([caa6bc8](https://github.com/deephaven/web-client-ui/commit/caa6bc8a801176b4624127aeb3c1e1cf1e346df3)), closes [#1432](https://github.com/deephaven/web-client-ui/issues/1432)
+
+
+### Features
+
+* Added .git-blame-ignore-revs ([#1431](https://github.com/deephaven/web-client-ui/issues/1431)) ([e3db6bf](https://github.com/deephaven/web-client-ui/commit/e3db6bfba375b081892d25183d45c3724435ba62)), closes [#1429](https://github.com/deephaven/web-client-ui/issues/1429)
+
+
+
+
+
+# [0.45.0](https://github.com/deephaven/web-client-ui/compare/v0.44.1...v0.45.0) (2023-07-31)
+
+### Bug Fixes
+
+- Ran npm audit fix on packages ([#1421](https://github.com/deephaven/web-client-ui/issues/1421)) ([0d61220](https://github.com/deephaven/web-client-ui/commit/0d61220bb0b25e7e0a406df96a25f87b644f2716))
+
+### Features
+
+- Add support for Category plots with error bars ([#1412](https://github.com/deephaven/web-client-ui/issues/1412)) ([7480280](https://github.com/deephaven/web-client-ui/commit/7480280861d588ba7c1d011a748d65df587fcfa8))
+- Added containsIgnoreCase to FilterValue interface ([#1426](https://github.com/deephaven/web-client-ui/issues/1426)) ([d131b05](https://github.com/deephaven/web-client-ui/commit/d131b051c6dece462a6691ca0013bb4fb0ba9a71)), closes [#1425](https://github.com/deephaven/web-client-ui/issues/1425)
+- Upgrade Prettier to 3.0.0 ([#1420](https://github.com/deephaven/web-client-ui/issues/1420)) ([334e530](https://github.com/deephaven/web-client-ui/commit/334e530bf83cebf2cfe3593f2d6e9fd7304c562a)), closes [#1419](https://github.com/deephaven/web-client-ui/issues/1419)
+
+## [0.44.1](https://github.com/deephaven/web-client-ui/compare/v0.44.0...v0.44.1) (2023-07-11)
+
+### Bug Fixes
+
+- tree and rollup default to non-sortable ([#1404](https://github.com/deephaven/web-client-ui/issues/1404)) ([5a8f34d](https://github.com/deephaven/web-client-ui/commit/5a8f34def53f03796fab265e2d1b1951480b5ecb)), closes [#1402](https://github.com/deephaven/web-client-ui/issues/1402)
+
+# [0.44.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.44.0) (2023-07-07)
+
+### Bug Fixes
+
+- export TypeUtils ([#1395](https://github.com/deephaven/web-client-ui/issues/1395)) ([c76730f](https://github.com/deephaven/web-client-ui/commit/c76730f5a6f8a973b3e51bb7c7da5e79891ac86c))
+- Use user permissions for iframes instead of query parameters ([#1400](https://github.com/deephaven/web-client-ui/issues/1400)) ([8cf2bbd](https://github.com/deephaven/web-client-ui/commit/8cf2bbd754f9312ca19945e9ffa6d7ce542c9516)), closes [#1337](https://github.com/deephaven/web-client-ui/issues/1337)
+
+### Features
+
+- "Extends" TypeScript util type ([#1394](https://github.com/deephaven/web-client-ui/issues/1394)) ([7cb073f](https://github.com/deephaven/web-client-ui/commit/7cb073f8897a0a03e2f86c65f94faccc46fded35)), closes [#1393](https://github.com/deephaven/web-client-ui/issues/1393)
+- DH-14538: Export InputEditor and added options ([#1398](https://github.com/deephaven/web-client-ui/issues/1398)) ([405f42f](https://github.com/deephaven/web-client-ui/commit/405f42f9dfc880319c7d5afbf80d81b04965ec52)), closes [#1397](https://github.com/deephaven/web-client-ui/issues/1397)
+- disable column sorting on unsupported types ([#1390](https://github.com/deephaven/web-client-ui/issues/1390)) ([3a89bbf](https://github.com/deephaven/web-client-ui/commit/3a89bbf4d28494c03541d474deb408c2ece4606a)), closes [#1380](https://github.com/deephaven/web-client-ui/issues/1380)
+- Outdent code when running selection from a notebook ([#1391](https://github.com/deephaven/web-client-ui/issues/1391)) ([154ccfc](https://github.com/deephaven/web-client-ui/commit/154ccfccd5a6f9996d67f0fcc71d031985bfd6a5)), closes [#1326](https://github.com/deephaven/web-client-ui/issues/1326)
+
+# [0.43.0](https://github.com/deephaven/web-client-ui/compare/v0.42.0...v0.43.0) (2023-07-07)
+
+### Bug Fixes
+
+- export TypeUtils ([#1395](https://github.com/deephaven/web-client-ui/issues/1395)) ([c76730f](https://github.com/deephaven/web-client-ui/commit/c76730f5a6f8a973b3e51bb7c7da5e79891ac86c))
+- Use user permissions for iframes instead of query parameters ([#1400](https://github.com/deephaven/web-client-ui/issues/1400)) ([8cf2bbd](https://github.com/deephaven/web-client-ui/commit/8cf2bbd754f9312ca19945e9ffa6d7ce542c9516)), closes [#1337](https://github.com/deephaven/web-client-ui/issues/1337)
+
+### Features
+
+- "Extends" TypeScript util type ([#1394](https://github.com/deephaven/web-client-ui/issues/1394)) ([7cb073f](https://github.com/deephaven/web-client-ui/commit/7cb073f8897a0a03e2f86c65f94faccc46fded35)), closes [#1393](https://github.com/deephaven/web-client-ui/issues/1393)
+- DH-14538: Export InputEditor and added options ([#1398](https://github.com/deephaven/web-client-ui/issues/1398)) ([405f42f](https://github.com/deephaven/web-client-ui/commit/405f42f9dfc880319c7d5afbf80d81b04965ec52)), closes [#1397](https://github.com/deephaven/web-client-ui/issues/1397)
+- disable column sorting on unsupported types ([#1390](https://github.com/deephaven/web-client-ui/issues/1390)) ([3a89bbf](https://github.com/deephaven/web-client-ui/commit/3a89bbf4d28494c03541d474deb408c2ece4606a)), closes [#1380](https://github.com/deephaven/web-client-ui/issues/1380)
+- Outdent code when running selection from a notebook ([#1391](https://github.com/deephaven/web-client-ui/issues/1391)) ([154ccfc](https://github.com/deephaven/web-client-ui/commit/154ccfccd5a6f9996d67f0fcc71d031985bfd6a5)), closes [#1326](https://github.com/deephaven/web-client-ui/issues/1326)
+
+# [0.42.0](https://github.com/deephaven/web-client-ui/compare/v0.41.1...v0.42.0) (2023-06-29)
+
+### Bug Fixes
+
+- AuthPluginParent wasn't working when embedded in an iframe ([#1383](https://github.com/deephaven/web-client-ui/issues/1383)) ([e23695d](https://github.com/deephaven/web-client-ui/commit/e23695d4baf232720ca89cb7d24e9a918f3fe913)), closes [#1373](https://github.com/deephaven/web-client-ui/issues/1373)
+- DH-15032: Fix incorrect warning about updated shared state ([#1364](https://github.com/deephaven/web-client-ui/issues/1364)) ([9e53dd2](https://github.com/deephaven/web-client-ui/commit/9e53dd2796b84963bd90e7043122a6b2c4d3cf46))
+- Ran npm audit fix on packages ([#1357](https://github.com/deephaven/web-client-ui/issues/1357)) ([0830099](https://github.com/deephaven/web-client-ui/commit/083009992e5f727f6f9dc9e9c2280b614315ab99))
+
+### Features
+
+- add column count to table tooltip ([#1382](https://github.com/deephaven/web-client-ui/issues/1382)) ([004ac6c](https://github.com/deephaven/web-client-ui/commit/004ac6cc1bd7772477b8e922075a344a4f8e71d3))
+- add sort-slash icon ([#1381](https://github.com/deephaven/web-client-ui/issues/1381)) ([9a7b910](https://github.com/deephaven/web-client-ui/commit/9a7b910f2075b252c81c08c7cc54f61bbe4458db)), closes [#1380](https://github.com/deephaven/web-client-ui/issues/1380)
+- Console output test util ([#1370](https://github.com/deephaven/web-client-ui/issues/1370)) ([626de83](https://github.com/deephaven/web-client-ui/commit/626de830ba4f580c90b0d0e2ee51ce8fd0452ad9)), closes [#1369](https://github.com/deephaven/web-client-ui/issues/1369)
+- improvements to null and empty strings filters in grid ([#1348](https://github.com/deephaven/web-client-ui/issues/1348)) ([ed3a8c5](https://github.com/deephaven/web-client-ui/commit/ed3a8c5f224094306ff55f9b41706cb58ff709e2)), closes [#1243](https://github.com/deephaven/web-client-ui/issues/1243)
+
+### Reverts
+
+- adding back "Table rendering support for databars ([#1212](https://github.com/deephaven/web-client-ui/issues/1212))" ([#1365](https://github.com/deephaven/web-client-ui/issues/1365)) ([8586d4d](https://github.com/deephaven/web-client-ui/commit/8586d4d99e55def1747eb820e824b61703990e58))
+
+## [0.41.1](https://github.com/deephaven/web-client-ui/compare/v0.41.0...v0.41.1) (2023-06-08)
+
+### Bug Fixes
+
+- Cannot add control from Controls menu with click ([#1363](https://github.com/deephaven/web-client-ui/issues/1363)) ([65c0925](https://github.com/deephaven/web-client-ui/commit/65c09253608f7c8c887ca4e70cc5632e81673301)), closes [#1362](https://github.com/deephaven/web-client-ui/issues/1362)
+
+# [0.41.0](https://github.com/deephaven/web-client-ui/compare/v0.40.4...v0.41.0) (2023-06-08)
+
+### Bug Fixes
+
+- Catch errors when emitting events to prevent breaking entire layout ([#1353](https://github.com/deephaven/web-client-ui/issues/1353)) ([aac5bd2](https://github.com/deephaven/web-client-ui/commit/aac5bd2ad4aeb88ac1fb18236f7bfb983ae35cf0)), closes [#1352](https://github.com/deephaven/web-client-ui/issues/1352)
+- DH-14972 Remove setSearch debounce in CommandHistoryViewportUpdater ([#1351](https://github.com/deephaven/web-client-ui/issues/1351)) ([2601146](https://github.com/deephaven/web-client-ui/commit/26011467be3bb5947a2cf34d78eaaaedc47d909b))
+
+### Features
+
+- Improve golden layout tab overflow drop down behaviour ([#1330](https://github.com/deephaven/web-client-ui/issues/1330)) ([9331822](https://github.com/deephaven/web-client-ui/commit/933182277eb4226caa45871d651789a70fc573d3))
+
+## [0.40.4](https://github.com/deephaven/web-client-ui/compare/v0.40.3...v0.40.4) (2023-06-02)
+
+### Bug Fixes
+
+- Add a default DashboardPanelWrapper ([#1346](https://github.com/deephaven/web-client-ui/issues/1346)) ([ddd92cf](https://github.com/deephaven/web-client-ui/commit/ddd92cf94ee038da9f6b998b12f533d17a400bc4)), closes [#1329](https://github.com/deephaven/web-client-ui/issues/1329)
+- DateWrapper fails on first day of month ([#1342](https://github.com/deephaven/web-client-ui/issues/1342)) ([a4677eb](https://github.com/deephaven/web-client-ui/commit/a4677eb0215b9f3746d68068b0ae13b36736a228)), closes [#1341](https://github.com/deephaven/web-client-ui/issues/1341)
+- DH-14657 Disconnect handling increase debounce timeout ([#1347](https://github.com/deephaven/web-client-ui/issues/1347)) ([66bdad8](https://github.com/deephaven/web-client-ui/commit/66bdad8b548e62c938cc13bc9fe0dd7ca1257943))
+- panels menu should only open downwards ([#1340](https://github.com/deephaven/web-client-ui/issues/1340)) ([a25be7f](https://github.com/deephaven/web-client-ui/commit/a25be7f0c0e043340bed88ad5a5923ab852917ee))
+
+## [0.40.3](https://github.com/deephaven/web-client-ui/compare/v0.40.2...v0.40.3) (2023-05-31)
+
+### Bug Fixes
+
+- today/yesterday keywords failed on last/first day of month ([#1336](https://github.com/deephaven/web-client-ui/issues/1336)) ([4c3fe24](https://github.com/deephaven/web-client-ui/commit/4c3fe24c083a827b0d8ec57219a0083c84bb894c)), closes [#1335](https://github.com/deephaven/web-client-ui/issues/1335)
+
+### Reverts
+
+- "refactor: Clean up golden-layout css ([#1322](https://github.com/deephaven/web-client-ui/issues/1322))" ([#1334](https://github.com/deephaven/web-client-ui/issues/1334)) ([2f7928a](https://github.com/deephaven/web-client-ui/commit/2f7928a67e14f2026aef73cee542045ce7477351))
+
+## [0.40.2](https://github.com/deephaven/web-client-ui/compare/v0.40.1...v0.40.2) (2023-05-31)
+
+### Bug Fixes
+
+- disable screenshot tests in debug mode ([#1328](https://github.com/deephaven/web-client-ui/issues/1328)) ([cbe8f72](https://github.com/deephaven/web-client-ui/commit/cbe8f72267a270c41dcb7fd241e6da424fade296)), closes [#1327](https://github.com/deephaven/web-client-ui/issues/1327)
+- failing linter test from de-globalize PR ([#1321](https://github.com/deephaven/web-client-ui/issues/1321)) ([6ae174c](https://github.com/deephaven/web-client-ui/commit/6ae174c9b6ae222abc515f09d609747976d9d6d6))
+- notebook panel unsaved indicator not showing after dragging a panel ([#1325](https://github.com/deephaven/web-client-ui/issues/1325)) ([99818a8](https://github.com/deephaven/web-client-ui/commit/99818a8ee4b505da7708914105a4197abdc502d8))
+- truncated column headers ([#1319](https://github.com/deephaven/web-client-ui/issues/1319)) ([db7716e](https://github.com/deephaven/web-client-ui/commit/db7716ebe953611ab4b4eec781e2e03204380ebd)), closes [#1318](https://github.com/deephaven/web-client-ui/issues/1318)
+- Worker plugin definitions, optional panel wrapper for Dashboards ([#1329](https://github.com/deephaven/web-client-ui/issues/1329)) ([c32ffbc](https://github.com/deephaven/web-client-ui/commit/c32ffbcf66826c4e2da3ac82e5b5086524d05ec8))
+
 ## [0.40.1](https://github.com/deephaven/web-client-ui/compare/v0.40.0...v0.40.1) (2023-05-24)
 
 ### Bug Fixes
