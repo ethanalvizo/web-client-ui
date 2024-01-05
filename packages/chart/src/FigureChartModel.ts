@@ -152,10 +152,12 @@ class FigureChartModel extends ChartModel {
     for (let i = 0; i < charts.length; i += 1) {
       const chart = charts[i];
 
+      this.newAddSeries(chart.series, axes, chart.showLegend);
+
       for (let j = 0; j < chart.series.length; j += 1) {
         const series = chart.series[j];
         activeSeriesNames.push(series.name);
-        this.addSeries(series, axes, chart.showLegend);
+        // this.addSeries(series, axes, chart.showLegend);
       }
     }
 
@@ -168,7 +170,63 @@ class FigureChartModel extends ChartModel {
       const seriesName = inactiveSeriesNames[i];
       this.seriesDataMap.delete(seriesName);
     }
+
+    // this.seriesToProcess = new Set([...this.seriesDataMap.keys()]);
+  }
+
+  newAddSeries(
+    series: Series[],
+    axes: Axis[],
+    showLegend: boolean | null
+  ): void {
+    const { dh } = this;
+    const axisTypeMap: AxisTypeMap = ChartUtils.groupArray(axes, 'type');
+
+    for (let i = 0; i < series.length; i += 1) {
+      const seriesData = this.chartUtils.makeSeriesDataFromSeries(
+        series[i],
+        axisTypeMap,
+        ChartUtils.getSeriesVisibility(series[i].name, this.settings),
+        this.theme,
+        showLegend
+      );
+      this.seriesDataMap.set(series[i].name, seriesData);
+
+      if (series[i].plotStyle === dh.plot.SeriesPlotStyle.STACKED_BAR) {
+        this.layout.barmode = 'stack';
+      } else if (series[i].plotStyle === dh.plot.SeriesPlotStyle.PIE) {
+        this.layout.hiddenlabels = ChartUtils.getHiddenLabels(this.settings);
+      }
+
+      // We only want to force hide the legend if there is only one series that is not a PIE
+      // Right now this means that if the user only has one series, they cannot explicitly show the legend until deephaven-core#3254 is implemented
+      // TODO: deephaven-core#3254, once done, this can be removed.
+      this.layout.showlegend =
+        this.data.length > 1 ||
+        series[i].plotStyle === dh.plot.SeriesPlotStyle.PIE
+          ? showLegend ?? undefined
+          : false;
+
+      if (series[i].oneClick != null) {
+        const { oneClick } = series[i];
+        const { columns } = oneClick;
+        for (let j = 0; j < columns.length; j += 1) {
+          this.filterColumnMap.set(columns[j].name, columns[j]);
+        }
+
+        this.oneClicks.push(oneClick);
+      }
+
+      // TODO: check if every series needs to be subscribed to. Subscribing to the last in the set didnt seem to change anything
+      if (i === series.length - 1) {
+        series[i].subscribe();
+      }
+    }
+
+    this.data = [...this.seriesDataMap.values()];
     this.seriesToProcess = new Set([...this.seriesDataMap.keys()]);
+
+    this.updateLayoutFormats();
   }
 
   /**
@@ -225,14 +283,18 @@ class FigureChartModel extends ChartModel {
   addPendingSeries = debounce(() => {
     const axes = ChartUtils.getAllAxes(this.figure);
     const { pendingSeries } = this;
-    for (let i = 0; i < pendingSeries.length; i += 1) {
-      const series = pendingSeries[i];
-      const chart = this.figure.charts.find(c => c.series.includes(series));
-      this.addSeries(series, axes, chart?.showLegend ?? null);
 
-      series.subscribe();
-      // We'll get an update with the data after subscribing
-    }
+    // TODO: group the pending series by chart and call newAddseries for each chart. I need it for the last variable passed in, showLegend.
+    this.newAddSeries(pendingSeries, axes, null);
+
+    // for (let i = 0; i < pendingSeries.length; i += 1) {
+    //   const series = pendingSeries[i];
+    //   const chart = this.figure.charts.find(c => c.series.includes(series));
+    //   this.addSeries(series, axes, chart?.showLegend ?? null);
+
+    //   // series.subscribe();
+    //   // We'll get an update with the data after subscribing
+    // }
 
     this.pendingSeries = [];
   }, FigureChartModel.ADD_SERIES_DEBOUNCE);
