@@ -1,4 +1,5 @@
 import {
+  type GridMetrics,
   type GridRange,
   type GridState,
   GridUtils,
@@ -76,8 +77,9 @@ export type HydratedIrisGridState = Pick<
   | 'conditionalFormats'
   | 'columnHeaderGroups'
   | 'partitionConfig'
-  | 'metrics'
->;
+> & {
+  metrics?: Partial<GridMetrics>;
+};
 
 export type DehydratedPendingDataMap<T> = [number, { data: [string, T][] }][];
 

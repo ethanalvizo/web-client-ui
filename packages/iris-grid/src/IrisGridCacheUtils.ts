@@ -69,12 +69,10 @@ function areIrisGridStatesEqual(
 
   return (
     irisGridStateA === irisGridStateB ||
-    (irisGridStateA.metrics != null &&
-      irisGridStateB.metrics != null &&
-      irisGridStateA.metrics.userColumnWidths ===
-        irisGridStateB.metrics.userColumnWidths &&
-      irisGridStateA.metrics.userRowHeights ===
-        irisGridStateB.metrics.userRowHeights &&
+    (irisGridStateA.metrics?.userColumnWidths ===
+      irisGridStateB.metrics?.userColumnWidths &&
+      irisGridStateA.metrics?.userRowHeights ===
+        irisGridStateB.metrics?.userRowHeights &&
       compareStateKeys.every(
         key => irisGridStateA[key] === irisGridStateB[key]
       ))
