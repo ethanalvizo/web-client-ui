@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.1](https://github.com/deephaven/web-client-ui/compare/v1.17.0...v1.17.1) (2026-04-01)
+
+### Bug Fixes
+
+- **golden-layout:** exclude test files from build output ([#2642](https://github.com/deephaven/web-client-ui/issues/2642)) ([dc84a67](https://github.com/deephaven/web-client-ui/commit/dc84a671f588abe4869b30149f48d50bb3d98632))
+
+## [1.17.0](https://github.com/deephaven/web-client-ui/compare/v1.16.1...v1.17.0) (2026-03-25)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+## [1.16.0](https://github.com/deephaven/web-client-ui/compare/v1.15.1...v1.16.0) (2026-03-18)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+## [1.14.0](https://github.com/deephaven/web-client-ui/compare/v1.13.0...v1.14.0) (2026-02-13)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+## [1.13.0](https://github.com/deephaven/web-client-ui/compare/v1.12.1...v1.13.0) (2026-02-03)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+## [1.12.1](https://github.com/deephaven/web-client-ui/compare/v1.12.0...v1.12.1) (2026-01-28)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
+## [1.12.0](https://github.com/deephaven/web-client-ui/compare/v1.11.0...v1.12.0) (2026-01-21)
+
+**Note:** Version bump only for package @deephaven/golden-layout
+
 ## [1.11.0](https://github.com/deephaven/web-client-ui/compare/v1.10.3...v1.11.0) (2026-01-06)
 
 ### Features

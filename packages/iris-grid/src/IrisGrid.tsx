@@ -554,7 +554,7 @@ class IrisGrid extends Component<IrisGridProps, IrisGridState> {
     },
     canCopy: true,
     canDownloadCsv: true,
-    frozenColumns: EMPTY_ARRAY,
+    frozenColumns: undefined,
     // Do not set a default density prop since we need to know if it overrides the global density setting
     density: undefined,
     canToggleSearch: true,
@@ -958,8 +958,13 @@ class IrisGrid extends Component<IrisGridProps, IrisGridState> {
         this.clearGridInputField();
         this.clearCrossColumSearch();
       }
-      this.startLoading('Filtering...', { resetRanges: true });
-      this.applyInputFilters(changedInputFilters, replaceExistingFilters);
+      const isChanged = this.applyInputFilters(
+        changedInputFilters,
+        replaceExistingFilters
+      );
+      if (isChanged) {
+        this.startLoading('Filtering...', { resetRanges: true });
+      }
     }
 
     if (isSelectingColumn !== prevProps.isSelectingColumn) {
@@ -1671,11 +1676,12 @@ class IrisGrid extends Component<IrisGridProps, IrisGridState> {
    * and clears any existing quickFilters or advancedFilters on that column
    * @param inputFilters Array of input filters to apply
    * @param replaceExisting If true, new filters will replace the existing ones, instead of merging
+   * @returns True if any filters were changed as a result of this operation
    */
   applyInputFilters(
     inputFilters: InputFilter[],
     replaceExisting = false
-  ): void {
+  ): boolean {
     const { model } = this.props;
     const { advancedFilters, quickFilters } = this.state;
     const newAdvancedFilters = replaceExisting
@@ -1704,6 +1710,7 @@ class IrisGrid extends Component<IrisGridProps, IrisGridState> {
         advancedFilters: newAdvancedFilters,
       });
     }
+    return isChanged;
   }
 
   /**
@@ -2986,10 +2993,10 @@ class IrisGrid extends Component<IrisGridProps, IrisGridState> {
     }
     // if a row is selected
     const { model } = this.props;
-    const { name, type } = model.columns[cursorColumn];
+    const { name } = model.columns[cursorColumn];
 
-    const cellValue = model.valueForCell(cursorColumn, cursorRow);
-    const text = IrisGridUtils.convertValueToText(cellValue, type);
+    // Use raw value (same as Copy Cell Unformatted) to preserve full precision and timezone
+    const text = String(this.getValueForCell(cursorColumn, cursorRow, true));
     this.setState({
       isGotoShown: !isGotoShown,
       gotoRow: `${cursorRow + 1}`,

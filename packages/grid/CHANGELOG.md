@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.18.0](https://github.com/deephaven/web-client-ui/compare/v1.17.1...v1.18.0) (2026-04-09)
+
+### Features
+
+- Export GridColorUtils ([#2655](https://github.com/deephaven/web-client-ui/issues/2655)) ([af923d4](https://github.com/deephaven/web-client-ui/commit/af923d439936f0949386ed16e5a647a73c008f87))
+
+## [1.17.1](https://github.com/deephaven/web-client-ui/compare/v1.17.0...v1.17.1) (2026-04-01)
+
+### Bug Fixes
+
+- DH-21616: Databar overrides text color when using format prop ([#2640](https://github.com/deephaven/web-client-ui/issues/2640)) ([f5425e9](https://github.com/deephaven/web-client-ui/commit/f5425e97d359a2bd9fc13bf18d822898c8364a39))
+- DH-22093: Fix web UI freezing bug from grid-block-events ([#2646](https://github.com/deephaven/web-client-ui/issues/2646)) ([c1ba8d9](https://github.com/deephaven/web-client-ui/commit/c1ba8d936b8d96fb4ca52a262421e09076a3c2fd))
+
+## [1.15.1](https://github.com/deephaven/web-client-ui/compare/v1.15.0...v1.15.1) (2026-03-05)
+
+### Bug Fixes
+
+- DH-21658: Fix grid rendering hidden columns ([#2626](https://github.com/deephaven/web-client-ui/issues/2626)) ([e54c0ac](https://github.com/deephaven/web-client-ui/commit/e54c0ac6c8a9a12a159731c358a72f259248f642))
+
+## [1.13.0](https://github.com/deephaven/web-client-ui/compare/v1.12.1...v1.13.0) (2026-02-03)
+
+### Features
+
+- DH-21234: Display Simple Input Table Errors ([#2615](https://github.com/deephaven/web-client-ui/issues/2615)) ([39bee3e](https://github.com/deephaven/web-client-ui/commit/39bee3e9aecc9ad1dc6309d75862704fd4e4a0db))
+
+## [1.12.0](https://github.com/deephaven/web-client-ui/compare/v1.11.0...v1.12.0) (2026-01-21)
+
+### Features
+
+- DH-20363: Pivot filter support ([#2602](https://github.com/deephaven/web-client-ui/issues/2602)) ([ec1192b](https://github.com/deephaven/web-client-ui/commit/ec1192b5777de2a343452f5855cd46ff2a8b2d0a))
+
+### Bug Fixes
+
+- DH-21367: Fix shifting header group text ([#2603](https://github.com/deephaven/web-client-ui/issues/2603)) ([1b517d6](https://github.com/deephaven/web-client-ui/commit/1b517d6e1f0b03a3ee09d2694b9830263632f84c))
+
 ## [1.11.0](https://github.com/deephaven/web-client-ui/compare/v1.10.3...v1.11.0) (2026-01-06)
 
 ### ⚠ BREAKING CHANGES

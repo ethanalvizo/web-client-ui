@@ -353,6 +353,10 @@ class Grid extends PureComponent<GridProps, GridState> {
   // blocked pointer events that would otherwise prevent cursor styling from showing
   documentCursor: string | null;
 
+  // Track if this Grid instance added the grid-block-events class
+  // Used to ensure only the Grid that added the class removes it
+  hasAddedBlockEvents: boolean;
+
   dragTimer: ReturnType<typeof setTimeout> | null;
 
   keyHandlers: readonly KeyHandler[];
@@ -410,6 +414,7 @@ class Grid extends PureComponent<GridProps, GridState> {
     // Note: on document, not body so that cursor styling can be combined with
     // blocked pointer events that would otherwise prevent cursor styling from showing
     this.documentCursor = null;
+    this.hasAddedBlockEvents = false;
 
     this.dragTimer = null;
 
@@ -1632,13 +1637,15 @@ class Grid extends PureComponent<GridProps, GridState> {
     row: VisibleIndex,
     value: string
   ): boolean {
-    const { model } = this.props;
+    const { model, onError } = this.props;
     assertIsEditableGridModel(model);
 
     const modelColumn = this.getModelColumn(column);
     const modelRow = this.getModelRow(row);
     if (model.isValidForCell(modelColumn, modelRow, value)) {
-      model.setValueForCell(modelColumn, modelRow, value);
+      model.setValueForCell(modelColumn, modelRow, value).catch(err => {
+        onError(err instanceof Error ? err : new Error(`${err}`));
+      });
       return true;
     }
     return false;
@@ -1650,7 +1657,7 @@ class Grid extends PureComponent<GridProps, GridState> {
    * @param value The value to set on all the ranges
    */
   setValueForRanges(ranges: readonly GridRange[], value: string): void {
-    const { model } = this.props;
+    const { model, onError } = this.props;
     const { movedColumns, movedRows } = this.state;
 
     const modelRanges = GridUtils.getModelRanges(
@@ -1659,7 +1666,9 @@ class Grid extends PureComponent<GridProps, GridState> {
       movedRows
     );
     if (isEditableGridModel(model)) {
-      model.setValueForRanges(modelRanges, value);
+      model.setValueForRanges(modelRanges, value).catch(err => {
+        onError(err instanceof Error ? err : new Error(`${err}`));
+      });
     }
   }
 
@@ -1699,13 +1708,19 @@ class Grid extends PureComponent<GridProps, GridState> {
       document.documentElement.classList.add(this.documentCursor);
     }
     document.documentElement.classList.add('grid-block-events');
+    this.hasAddedBlockEvents = true;
   }
 
   removeDocumentCursor(): void {
     if (this.documentCursor != null) {
       document.documentElement.classList.remove(this.documentCursor);
-      document.documentElement.classList.remove('grid-block-events');
       this.documentCursor = null;
+    }
+    // Only remove grid-block-events if this Grid instance added it
+    // This prevents one Grid from removing the class on unmount while another Grid is still dragging
+    if (this.hasAddedBlockEvents) {
+      document.documentElement.classList.remove('grid-block-events');
+      this.hasAddedBlockEvents = false;
     }
   }
 
@@ -1914,24 +1929,23 @@ class Grid extends PureComponent<GridProps, GridState> {
   }
 
   handleMouseUp(event: MouseEvent): void {
-    // Ignore right click while dragging
+    // Ignore non-left click while dragging to allow drag to continue
     const { isDragging } = this.state;
-    if (isDragging && event.button === 2) {
+    if (isDragging && event.button !== 0) {
       return;
     }
 
     window.removeEventListener('mousemove', this.handleMouseDrag, true);
     window.removeEventListener('mouseup', this.handleMouseUp, true);
 
+    this.stopDragTimer();
+    this.removeDocumentCursor();
+
     if (event.button != null && event.button !== 0) {
       return;
     }
 
     this.notifyMouseHandlers('onUp', event, false);
-
-    this.stopDragTimer();
-
-    this.removeDocumentCursor();
   }
 
   handleResize(): void {

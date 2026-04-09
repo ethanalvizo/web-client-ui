@@ -22,7 +22,7 @@ For details on how to contribute to this repository, please see the [contributin
 
 ## Getting Started
 
-We are using node 18.x and npm 8.x. If you are [using nvm](https://github.com/nvm-sh/nvm#installing-and-updating), there is an [.nvmrc](.nvmrc) file, so just run `nvm install` to get the latest 18.x/8.x versions (or set up your environment to [automatically switch](https://github.com/nvm-sh/nvm#deeper-shell-integration)). Otherwise, download from the [node homepage](https://nodejs.org/en/download/).
+We are using node 24.x and npm 11.x. If you are [using nvm](https://github.com/nvm-sh/nvm#installing-and-updating), there is an [.nvmrc](.nvmrc) file, so just run `nvm install` to get the latest 24.x/11.x versions (or set up your environment to [automatically switch](https://github.com/nvm-sh/nvm#deeper-shell-integration)). Otherwise, download from the [node homepage](https://nodejs.org/en/download/).
 
 In order to use the UI, you must also be running a [deephaven-core](https://github.com/deephaven/deephaven-core) server on port 10000. The server provides APIs that the web-client-ui depends upon. An easy way to get started is to launch a Deephaven container from the [quick start guide](https://deephaven.io/core/docs/tutorials/quickstart/).
 
@@ -191,9 +191,7 @@ All new changes (bug fixes, feature requests) are merged to `main` so they are a
 
 We use 3 release types
 
-- `stable` - Stable releases are created periodically off of the `main` with the dist-tag `latest`. These will include an appropriate version bump and [release notes](https://github.com/deephaven/web-client-ui/releases), detailing the changes that are in that version.
-
-- `nightly` - Nightly releases are published every night with the dist-tag `nightly` to npm. You can reference the nightly release to always be on the latest by referencing `nightly` as the version, though stability is not guaranteed, e.g. `npm install --save @deephaven/grid@nightly`.
+- `stable` - Stable releases are created periodically off of the `main` with the dist-tag `latest`. These will include an appropriate version bump and [release notes](https://github.com/deephaven/web-client-ui/releases), detailing the changes that are in that version. These releases are done every Wednesday if there are changes, but the schedule is not strict. The release process is manual, so it may be delayed if there are any issues that need to be resolved before the release can be published.
 
 - `hotfix` - For Long Term Support releases (versions we consume in the enterprise product), we create a new branch in Community matching the LTS version number (e.g. [release/v0.6](https://github.com/deephaven/web-client-ui/tree/release/v0.6)). Bug fixes/hotfixes are then either cherry-picked from `main` (if the fix has been merged to main), or directly merged into the hotfix branch (if code has changed in `main` and the fix only applies in the hotfix branch).
 

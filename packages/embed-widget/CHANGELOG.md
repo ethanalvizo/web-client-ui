@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.18.0](https://github.com/deephaven/web-client-ui/compare/v1.17.1...v1.18.0) (2026-04-09)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
+## [1.17.1](https://github.com/deephaven/web-client-ui/compare/v1.17.0...v1.17.1) (2026-04-01)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
+## [1.17.0](https://github.com/deephaven/web-client-ui/compare/v1.16.1...v1.17.0) (2026-03-25)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
+## [1.16.1](https://github.com/deephaven/web-client-ui/compare/v1.16.0...v1.16.1) (2026-03-19)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
+## [1.16.0](https://github.com/deephaven/web-client-ui/compare/v1.15.1...v1.16.0) (2026-03-18)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
+## [1.15.1](https://github.com/deephaven/web-client-ui/compare/v1.15.0...v1.15.1) (2026-03-05)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
+## [1.15.0](https://github.com/deephaven/web-client-ui/compare/v1.14.0...v1.15.0) (2026-02-25)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
+## [1.14.0](https://github.com/deephaven/web-client-ui/compare/v1.13.0...v1.14.0) (2026-02-13)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
+## [1.13.0](https://github.com/deephaven/web-client-ui/compare/v1.12.1...v1.13.0) (2026-02-03)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
+## [1.12.1](https://github.com/deephaven/web-client-ui/compare/v1.12.0...v1.12.1) (2026-01-28)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
+## [1.12.0](https://github.com/deephaven/web-client-ui/compare/v1.11.0...v1.12.0) (2026-01-21)
+
+**Note:** Version bump only for package @deephaven/embed-widget
+
 ## [1.11.0](https://github.com/deephaven/web-client-ui/compare/v1.10.3...v1.11.0) (2026-01-06)
 
 **Note:** Version bump only for package @deephaven/embed-widget

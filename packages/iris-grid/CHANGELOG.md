@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.18.0](https://github.com/deephaven/web-client-ui/compare/v1.17.1...v1.18.0) (2026-04-09)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
+## [1.17.1](https://github.com/deephaven/web-client-ui/compare/v1.17.0...v1.17.1) (2026-04-01)
+
+### Bug Fixes
+
+- DH-20036: Skip totalsConfig updates during model transitions to prevent stale column errors ([#2645](https://github.com/deephaven/web-client-ui/issues/2645)) ([68e2734](https://github.com/deephaven/web-client-ui/commit/68e2734fe3339e159f8976cc5bd25819b863d8b6))
+- DH-21696: Fixed broken frozen columns ([#2649](https://github.com/deephaven/web-client-ui/issues/2649)) ([b6edd2d](https://github.com/deephaven/web-client-ui/commit/b6edd2df3590ee10c0368e8ef77a99fb82d915cc)), closes [/github.com/deephaven/web-client-ui/pull/2527/changes#diff-ba5d5bc0271a84729ec1bd28c11b7e1f05b3e71e4015c0bea863b4bf52b85bd8R544](https://github.com/deephaven//github.com/deephaven/web-client-ui/pull/2527/changes/issues/diff-ba5d5bc0271a84729ec1bd28c11b7e1f05b3e71e4015c0bea863b4bf52b85bd8R544)
+
+## [1.17.0](https://github.com/deephaven/web-client-ui/compare/v1.16.1...v1.17.0) (2026-03-25)
+
+### Bug Fixes
+
+- DH-21869: Fix Conditional Formatting on Timestamp ([#2635](https://github.com/deephaven/web-client-ui/issues/2635)) ([0df7f10](https://github.com/deephaven/web-client-ui/commit/0df7f1040e23c44501b6ac09df73c702190dee88))
+- DH-22062: stop loading when input filter change has no effect on grid filters ([#2639](https://github.com/deephaven/web-client-ui/issues/2639)) ([6775c43](https://github.com/deephaven/web-client-ui/commit/6775c433d57537562746847ecce9d26a2781cfc3))
+
+## [1.16.0](https://github.com/deephaven/web-client-ui/compare/v1.15.1...v1.16.0) (2026-03-18)
+
+### Bug Fixes
+
+- DH-21722: Fix Goto Value for Timestamps ([#2633](https://github.com/deephaven/web-client-ui/issues/2633)) ([70a3085](https://github.com/deephaven/web-client-ui/commit/70a30853782007f182e2bc1715c4f6cfa0e652a7))
+
+## [1.15.1](https://github.com/deephaven/web-client-ui/compare/v1.15.0...v1.15.1) (2026-03-05)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
+## [1.15.0](https://github.com/deephaven/web-client-ui/compare/v1.14.0...v1.15.0) (2026-02-25)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
+## [1.14.0](https://github.com/deephaven/web-client-ui/compare/v1.13.0...v1.14.0) (2026-02-13)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
+## [1.13.0](https://github.com/deephaven/web-client-ui/compare/v1.12.1...v1.13.0) (2026-02-03)
+
+### ⚠ BREAKING CHANGES
+
+- matching PR for enterprise is up as draft.
+- Copy buttons default styling is now the same as a
+  default ActionButton, add the isQuiet prop to match previous default
+  styling.
+
+### Features
+
+- DH-21234: Display Simple Input Table Errors ([#2615](https://github.com/deephaven/web-client-ui/issues/2615)) ([39bee3e](https://github.com/deephaven/web-client-ui/commit/39bee3e9aecc9ad1dc6309d75862704fd4e4a0db))
+- Migrate CopyButton to use ActionButton as base ([#2616](https://github.com/deephaven/web-client-ui/issues/2616)) ([24f4580](https://github.com/deephaven/web-client-ui/commit/24f4580b84dce07c300f4bfeab99b700d7a81476))
+
+## [1.12.1](https://github.com/deephaven/web-client-ui/compare/v1.12.0...v1.12.1) (2026-01-28)
+
+**Note:** Version bump only for package @deephaven/iris-grid
+
+## [1.12.0](https://github.com/deephaven/web-client-ui/compare/v1.11.0...v1.12.0) (2026-01-21)
+
+### Features
+
+- DH-20363: Pivot filter support ([#2602](https://github.com/deephaven/web-client-ui/issues/2602)) ([ec1192b](https://github.com/deephaven/web-client-ui/commit/ec1192b5777de2a343452f5855cd46ff2a8b2d0a))
+
+### Bug Fixes
+
+- DH-21407: Dehydrate/hydrate pending data correctly ([#2606](https://github.com/deephaven/web-client-ui/issues/2606)) ([11df934](https://github.com/deephaven/web-client-ui/commit/11df934c510da8e6a61680391775a059132ac938))
+
 ## [1.11.0](https://github.com/deephaven/web-client-ui/compare/v1.10.3...v1.11.0) (2026-01-06)
 
 ### Bug Fixes

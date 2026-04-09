@@ -3,6 +3,111 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.18.0](https://github.com/deephaven/web-client-ui/compare/v1.17.1...v1.18.0) (2026-04-09)
+
+### Features
+
+- Export GridColorUtils ([#2655](https://github.com/deephaven/web-client-ui/issues/2655)) ([af923d4](https://github.com/deephaven/web-client-ui/commit/af923d439936f0949386ed16e5a647a73c008f87))
+
+### Bug Fixes
+
+- DH-21539: Prevent browser back navigation on horizontal overscroll ([#2654](https://github.com/deephaven/web-client-ui/issues/2654)) ([d504ec8](https://github.com/deephaven/web-client-ui/commit/d504ec853c6434343ea544b0ccee7710e666881b))
+
+## [1.17.1](https://github.com/deephaven/web-client-ui/compare/v1.17.0...v1.17.1) (2026-04-01)
+
+### Bug Fixes
+
+- DH-20036: Skip totalsConfig updates during model transitions to prevent stale column errors ([#2645](https://github.com/deephaven/web-client-ui/issues/2645)) ([68e2734](https://github.com/deephaven/web-client-ui/commit/68e2734fe3339e159f8976cc5bd25819b863d8b6))
+- DH-21616: Databar overrides text color when using format prop ([#2640](https://github.com/deephaven/web-client-ui/issues/2640)) ([f5425e9](https://github.com/deephaven/web-client-ui/commit/f5425e97d359a2bd9fc13bf18d822898c8364a39))
+- DH-21696: Fixed broken frozen columns ([#2649](https://github.com/deephaven/web-client-ui/issues/2649)) ([b6edd2d](https://github.com/deephaven/web-client-ui/commit/b6edd2df3590ee10c0368e8ef77a99fb82d915cc)), closes [/github.com/deephaven/web-client-ui/pull/2527/changes#diff-ba5d5bc0271a84729ec1bd28c11b7e1f05b3e71e4015c0bea863b4bf52b85bd8R544](https://github.com/deephaven//github.com/deephaven/web-client-ui/pull/2527/changes/issues/diff-ba5d5bc0271a84729ec1bd28c11b7e1f05b3e71e4015c0bea863b4bf52b85bd8R544)
+- DH-22093: Fix web UI freezing bug from grid-block-events ([#2646](https://github.com/deephaven/web-client-ui/issues/2646)) ([c1ba8d9](https://github.com/deephaven/web-client-ui/commit/c1ba8d936b8d96fb4ca52a262421e09076a3c2fd))
+- Fixes for nested dashboards/deephaven.ui ([#2648](https://github.com/deephaven/web-client-ui/issues/2648)) ([282c234](https://github.com/deephaven/web-client-ui/commit/282c234d8f1e4a66edd1dad59534b342b9a061e7))
+- **golden-layout:** exclude test files from build output ([#2642](https://github.com/deephaven/web-client-ui/issues/2642)) ([dc84a67](https://github.com/deephaven/web-client-ui/commit/dc84a671f588abe4869b30149f48d50bb3d98632))
+
+## [1.17.0](https://github.com/deephaven/web-client-ui/compare/v1.16.1...v1.17.0) (2026-03-25)
+
+### Features
+
+- DH-22048: Add optional button to dismiss the ErrorView component ([#2638](https://github.com/deephaven/web-client-ui/issues/2638)) ([7aa07c1](https://github.com/deephaven/web-client-ui/commit/7aa07c1d278c10e9c620c2951079a9ad5a3e109c))
+- **plugin:** add MultiPlugin type for registering multiple plugins from one module ([#2641](https://github.com/deephaven/web-client-ui/issues/2641)) ([56f8f62](https://github.com/deephaven/web-client-ui/commit/56f8f62b8a145d32fd3301de413c01a4abaa96f0))
+
+### Bug Fixes
+
+- DH-21869: Fix Conditional Formatting on Timestamp ([#2635](https://github.com/deephaven/web-client-ui/issues/2635)) ([0df7f10](https://github.com/deephaven/web-client-ui/commit/0df7f1040e23c44501b6ac09df73c702190dee88))
+- DH-22062: stop loading when input filter change has no effect on grid filters ([#2639](https://github.com/deephaven/web-client-ui/issues/2639)) ([6775c43](https://github.com/deephaven/web-client-ui/commit/6775c433d57537562746847ecce9d26a2781cfc3))
+
+## [1.16.1](https://github.com/deephaven/web-client-ui/compare/v1.16.0...v1.16.1) (2026-03-19)
+
+### Features
+
+- DH-21843: Additional Logging for DashboardLayout Config Change ([#2637](https://github.com/deephaven/web-client-ui/issues/2637)) ([5492e2b](https://github.com/deephaven/web-client-ui/commit/5492e2b8d44954813c62a549423cbc3c0f63fb4a))
+
+## [1.16.0](https://github.com/deephaven/web-client-ui/compare/v1.15.1...v1.16.0) (2026-03-18)
+
+### Features
+
+- DH-21947: Split out fetchVariableDefinitionByPredicate function ([#2634](https://github.com/deephaven/web-client-ui/issues/2634)) ([43f1963](https://github.com/deephaven/web-client-ui/commit/43f196325608552491ac948fb074b95dae6aaf5c))
+
+### Bug Fixes
+
+- DH-21722: Fix Goto Value for Timestamps ([#2633](https://github.com/deephaven/web-client-ui/issues/2633)) ([70a3085](https://github.com/deephaven/web-client-ui/commit/70a30853782007f182e2bc1715c4f6cfa0e652a7))
+
+## [1.15.1](https://github.com/deephaven/web-client-ui/compare/v1.15.0...v1.15.1) (2026-03-05)
+
+### Bug Fixes
+
+- DH-21658: Fix grid rendering hidden columns ([#2626](https://github.com/deephaven/web-client-ui/issues/2626)) ([e54c0ac](https://github.com/deephaven/web-client-ui/commit/e54c0ac6c8a9a12a159731c358a72f259248f642))
+
+## [1.15.0](https://github.com/deephaven/web-client-ui/compare/v1.14.0...v1.15.0) (2026-02-25)
+
+### Features
+
+- DH-21726: Debug log hasStatusCode unexpected status code ([#2625](https://github.com/deephaven/web-client-ui/issues/2625)) ([932df8d](https://github.com/deephaven/web-client-ui/commit/932df8d49edfa2ff141803d569ce9629c8541bd4))
+- Make hook viewportSubscriptionOptions in viewport hooks partial ([#2627](https://github.com/deephaven/web-client-ui/issues/2627)) ([8a94e8d](https://github.com/deephaven/web-client-ui/commit/8a94e8d4dbe5e6d09f44695ec3db50e59e141821))
+
+## [1.14.0](https://github.com/deephaven/web-client-ui/compare/v1.13.0...v1.14.0) (2026-02-13)
+
+### Features
+
+- DH-21211: Adding window listener hook ([#2620](https://github.com/deephaven/web-client-ui/issues/2620)) ([295322f](https://github.com/deephaven/web-client-ui/commit/295322fccfb4895c8e247bbb38de343a3ed49d75))
+
+### Bug Fixes
+
+- Typing for onLayoutConfigChange ([#2622](https://github.com/deephaven/web-client-ui/issues/2622)) ([83ae200](https://github.com/deephaven/web-client-ui/commit/83ae200bc91bd548b654b966dd16cdf7c17becc3))
+
+## [1.13.0](https://github.com/deephaven/web-client-ui/compare/v1.12.1...v1.13.0) (2026-02-03)
+
+### ⚠ BREAKING CHANGES
+
+- matching PR for enterprise is up as draft.
+- Copy buttons default styling is now the same as a
+  default ActionButton, add the isQuiet prop to match previous default
+  styling.
+
+### Features
+
+- DH-21234: Display Simple Input Table Errors ([#2615](https://github.com/deephaven/web-client-ui/issues/2615)) ([39bee3e](https://github.com/deephaven/web-client-ui/commit/39bee3e9aecc9ad1dc6309d75862704fd4e4a0db))
+- Migrate CopyButton to use ActionButton as base ([#2616](https://github.com/deephaven/web-client-ui/issues/2616)) ([24f4580](https://github.com/deephaven/web-client-ui/commit/24f4580b84dce07c300f4bfeab99b700d7a81476))
+
+## [1.12.1](https://github.com/deephaven/web-client-ui/compare/v1.12.0...v1.12.1) (2026-01-28)
+
+### Bug Fixes
+
+- readonly type changes ([#2610](https://github.com/deephaven/web-client-ui/issues/2610)) ([e5b4de0](https://github.com/deephaven/web-client-ui/commit/e5b4de0f53e6c2c576b0b78583ec1b9e9de00d50))
+
+## [1.12.0](https://github.com/deephaven/web-client-ui/compare/v1.11.0...v1.12.0) (2026-01-21)
+
+### Features
+
+- DH-20363: Pivot filter support ([#2602](https://github.com/deephaven/web-client-ui/issues/2602)) ([ec1192b](https://github.com/deephaven/web-client-ui/commit/ec1192b5777de2a343452f5855cd46ff2a8b2d0a))
+- DH-21259: Add map_style to theme ([#2605](https://github.com/deephaven/web-client-ui/issues/2605)) ([ff7b424](https://github.com/deephaven/web-client-ui/commit/ff7b4248f6b39550361ebb5d3c0295246c6f99b5))
+
+### Bug Fixes
+
+- DH-21027: Adjust setting menu header for proper contrast ([#2601](https://github.com/deephaven/web-client-ui/issues/2601)) ([1af8bc2](https://github.com/deephaven/web-client-ui/commit/1af8bc2fb9a8b1bc840f21c74c2539b60bbba8bc))
+- DH-21367: Fix shifting header group text ([#2603](https://github.com/deephaven/web-client-ui/issues/2603)) ([1b517d6](https://github.com/deephaven/web-client-ui/commit/1b517d6e1f0b03a3ee09d2694b9830263632f84c))
+- DH-21407: Dehydrate/hydrate pending data correctly ([#2606](https://github.com/deephaven/web-client-ui/issues/2606)) ([11df934](https://github.com/deephaven/web-client-ui/commit/11df934c510da8e6a61680391775a059132ac938))
+
 ## [1.11.0](https://github.com/deephaven/web-client-ui/compare/v1.10.3...v1.11.0) (2026-01-06)
 
 ### ⚠ BREAKING CHANGES

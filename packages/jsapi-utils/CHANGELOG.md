@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.16.0](https://github.com/deephaven/web-client-ui/compare/v1.15.1...v1.16.0) (2026-03-18)
+
+### Features
+
+- DH-21947: Split out fetchVariableDefinitionByPredicate function ([#2634](https://github.com/deephaven/web-client-ui/issues/2634)) ([43f1963](https://github.com/deephaven/web-client-ui/commit/43f196325608552491ac948fb074b95dae6aaf5c))
+
+## [1.12.1](https://github.com/deephaven/web-client-ui/compare/v1.12.0...v1.12.1) (2026-01-28)
+
+### Bug Fixes
+
+- readonly type changes ([#2610](https://github.com/deephaven/web-client-ui/issues/2610)) ([e5b4de0](https://github.com/deephaven/web-client-ui/commit/e5b4de0f53e6c2c576b0b78583ec1b9e9de00d50))
+
 ## [1.10.1](https://github.com/deephaven/web-client-ui/compare/v1.10.0...v1.10.1) (2025-11-27)
 
 **Note:** Version bump only for package @deephaven/jsapi-utils
