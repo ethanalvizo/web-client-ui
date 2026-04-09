@@ -1194,10 +1194,10 @@ class IrisGridUtils {
       customColumnFormatMap,
       columnAlignmentMap = EMPTY_MAP,
       isFilterBarShown,
-      metrics: { userColumnWidths, userRowHeights } = {
-        userColumnWidths: EMPTY_MAP,
-        userRowHeights: EMPTY_MAP,
-      },
+      metrics: {
+        userColumnWidths = new Map<ModelIndex, number>(),
+        userRowHeights = new Map<ModelIndex, number>(),
+      } = {},
       quickFilters,
       customColumns,
       conditionalFormats = EMPTY_ARRAY,
