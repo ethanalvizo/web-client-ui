@@ -9,7 +9,7 @@ import Button from './Button';
 
 export type HierarchicalCheckboxValueMap = Map<
   string,
-  boolean | Map<string, boolean>
+  boolean | HierarchicalCheckboxValueMap
 >;
 
 type HierarchicalCheckboxMenuProps = {
@@ -199,7 +199,7 @@ class HierarchicalCheckboxMenu extends Component<
                 <Checkbox
                   className="hcm-child"
                   key={child}
-                  checked={value}
+                  checked={typeof value === 'boolean' ? value : null}
                   onChange={() => this.toggleValueFor(parent, child)}
                 >
                   {child}
